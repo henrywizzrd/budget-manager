@@ -1,67 +1,71 @@
-import { router } from 'expo-router';
-import { TabList, Tabs, TabSlot, TabTrigger, TabTriggerSlotProps } from 'expo-router/ui';
-import { Pressable, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Redirect, router, usePathname } from 'expo-router';
+import { TabList, Tabs, TabSlot, TabTrigger } from 'expo-router/ui';
+import { useState } from 'react';
+import { View } from 'react-native';
 
-import { C, Icon, IconName, Txt } from '../../components/ui';
+import { DockTab, MyxDock } from '../../components/dock/MyxDock';
+import { Sheet } from '../../components/Sheet';
+import { Btn, Field } from '../../components/ui';
+import { useL, useMoney } from '../../lib/i18n';
+import { safeToSpend, ymd } from '../../lib/money';
+import { useStore } from '../../lib/store';
 
-type TabButtonProps = TabTriggerSlotProps & { icon: IconName; label: string };
-
-function TabButton({ icon, label, isFocused, ref: _ref, ...props }: TabButtonProps) {
-  const color = isFocused ? C.accent : C.sub;
-  return (
-    <Pressable
-      {...props}
-      accessibilityRole="tab"
-      accessibilityState={{ selected: !!isFocused }}
-      style={{ flex: 1, alignItems: 'center', gap: 3, paddingTop: 10, minHeight: 52 }}>
-      <Icon name={icon} color={color} />
-      <Txt size={11} w={isFocused ? 'semibold' : 'regular'} color={color}>{label}</Txt>
-    </Pressable>
-  );
+function activeTab(path: string): DockTab | null {
+  if (path.startsWith('/history')) return 'history';
+  if (path.startsWith('/assistant')) return 'assistant';
+  return 'index'; // Home, and Budget / Bills / Settings opened from Home
 }
 
 export default function TabsLayout() {
-  const insets = useSafeAreaInsets();
+  const { data, setNote } = useStore();
+  const L = useL();
+  const { fmt } = useMoney();
+  const path = usePathname();
+  const [noteOpen, setNoteOpen] = useState(false);
+  const [draft, setDraft] = useState('');
+  if (!data.settings.onboarded) return <Redirect href="/onboarding" />;
+
+  const s = safeToSpend(data);
+  const note = data.notes[ymd(new Date())] ?? '';
+  const href: Record<DockTab, '/' | '/history' | '/assistant'> = { index: '/', history: '/history', assistant: '/assistant' };
+
   return (
-    <Tabs style={{ flex: 1 }}>
-      <TabSlot style={{ flex: 1 }} />
-      <TabList
-        style={{
-          flexDirection: 'row',
-          alignItems: 'flex-start',
-          backgroundColor: C.card,
-          borderTopWidth: 1,
-          borderTopColor: C.line,
-          paddingBottom: Math.max(insets.bottom, 10),
-          paddingHorizontal: 6,
-        }}>
-        <TabTrigger name="index" href="/" asChild>
-          <TabButton icon="home" label="Trang chủ" />
-        </TabTrigger>
-        <TabTrigger name="budget" href="/budget" asChild>
-          <TabButton icon="pie" label="Ngân sách" />
-        </TabTrigger>
-        <View style={{ flex: 1, alignItems: 'center' }}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Thêm giao dịch bằng AI"
-            onPress={() => router.push('/add')}
-            style={({ pressed }) => ({
-              width: 58, height: 58, borderRadius: 29, backgroundColor: C.ink, marginTop: -20,
-              alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.85 : 1,
-              shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 6,
-            })}>
-            <Icon name="plus" color="#FFFFFF" size={26} stroke={2.2} />
-          </Pressable>
-        </View>
-        <TabTrigger name="assistant" href="/assistant" asChild>
-          <TabButton icon="chat" label="Trợ lý AI" />
-        </TabTrigger>
-        <TabTrigger name="settings" href="/settings" asChild>
-          <TabButton icon="settings" label="Cài đặt" />
-        </TabTrigger>
-      </TabList>
-    </Tabs>
+    <View style={{ flex: 1 }}>
+      <Tabs style={{ flex: 1 }}>
+        <TabSlot style={{ flex: 1 }} />
+        {/* Triggers only register the routes; the visible navigation is MyxDock */}
+        <TabList style={{ display: 'none' }}>
+          <TabTrigger name="index" href="/" />
+          <TabTrigger name="history" href="/history" />
+          <TabTrigger name="assistant" href="/assistant" />
+          <TabTrigger name="budget" href="/budget" />
+          <TabTrigger name="bills" href="/bills" />
+          <TabTrigger name="settings" href="/settings" />
+        </TabList>
+      </Tabs>
+      <MyxDock
+        active={activeTab(path)}
+        labels={{ index: L('Trang chủ', 'Home'), history: L('Lịch sử', 'History'), assistant: L('Trợ lý', 'Assistant') }}
+        onChange={(t) => router.navigate(href[t])}
+        onAdd={() => router.push('/add')}
+        addLabel={L('Thêm giao dịch', 'Add transaction')}
+        chip={{
+          title: L(`Hôm nay còn ${fmt(s.leftToday)}`, `${fmt(s.leftToday)} left today`),
+          note: note || 'Note',
+          noteEmpty: !note,
+          pct: s.daily ? s.leftToday / s.daily : 0,
+          a11y: L('Ghi chú hôm nay', "Today's note"),
+          onPress: () => {
+            setDraft(note);
+            setNoteOpen(true);
+          },
+        }}
+      />
+      <Sheet visible={noteOpen} onClose={() => setNoteOpen(false)} title={L('Ghi chú hôm nay', "Today's note")}>
+        <Field value={draft} onChangeText={setDraft} maxLength={80} autoFocus placeholder={L('Ví dụ: tối nay nấu ở nhà, không trà sữa', 'e.g. cook at home tonight, no milk tea')} />
+        <Btn label={L('Lưu', 'Save')} onPress={() => { setNote(draft.trim()); setNoteOpen(false); }} />
+        {!!note && <Btn label={L('Xóa ghi chú', 'Delete note')} kind="danger" onPress={() => { setNote(''); setNoteOpen(false); }} />}
+      </Sheet>
+    </View>
   );
 }

@@ -17,7 +17,7 @@ on:
 # Push bình thường thì 2 job bên dưới bị bỏ qua (không tốn gì), chỉ build khi lời nhắn commit có [build]
 
 jobs:
-  # Kiểm tra nhanh mỗi lần push (mọi commit): typecheck. Lint và unit test thêm vào khi cấu hình xong (tasks T003, T004)
+  # Kiểm tra nhanh mỗi lần push (mọi commit): typecheck + unit test (parser, tính tiền)
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -29,6 +29,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx tsc --noEmit
+      - run: npm test
 
   android:
     if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[build]')

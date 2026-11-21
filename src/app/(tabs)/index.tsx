@@ -1,118 +1,167 @@
 import { router } from 'expo-router';
-import { useMemo } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Pressable, View } from 'react-native';
 
+import { SpendCharts } from '../../components/Charts';
+import { CategoryIcon } from '../../components/icons/CategoryIcon';
+import { Screen } from '../../components/Screen';
 import { TxRow } from '../../components/TxRow';
-import { Btn, C, Card, Icon, Progress, Txt } from '../../components/ui';
-import { monthLabel, vnd } from '../../lib/format';
+import { Card, Icon, IconButton, Ring, Txt } from '../../components/ui';
+import { useL, useLang, useMoney } from '../../lib/i18n';
 import { buildInsights, monthStats } from '../../lib/insights';
+import { ddmm, safeToSpend, walletBalances } from '../../lib/money';
 import { useStore } from '../../lib/store';
+import { useColors } from '../../theme';
 
-export default function HomeScreen() {
-  const insets = useSafeAreaInsets();
-  const { data, loadSample } = useStore();
+export default function Home() {
+  const { data, addTransaction, updateSettings } = useStore();
+  const c = useColors();
+  const L = useL();
+  const lang = useLang();
+  const { fmt, short } = useMoney();
   const now = new Date();
-  const stats = useMemo(() => monthStats(data.transactions, data.categories, now.getFullYear(), now.getMonth(), now), [data]);
-  const insight = useMemo(() => buildInsights(data.transactions, data.categories, now)[0], [data]);
-  const recent = data.transactions.slice(0, 6);
-  const name = data.settings.userName.trim();
-  const usedPct = stats.budget > 0 ? stats.expense / stats.budget : 0;
-  const over = stats.remaining < 0;
-  const warnTone = insight?.tone === 'warn';
+  const s = safeToSpend(data, now);
+  const m = monthStats(data.transactions, data.categories, now.getFullYear(), now.getMonth(), now);
+  const insight = buildInsights(data.transactions, data.categories, now, lang)[0];
+  const balances = walletBalances(data);
+  const greet = data.settings.userName ? L(`Chào ${data.settings.userName}`, `Hi ${data.settings.userName}`) : L('Xin chào', 'Hello');
+  const dateLabel = now.toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US', { weekday: 'long', day: 'numeric', month: 'numeric' });
+  const survival = s.shortfall > 0;
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: C.bg }} contentContainerStyle={{ paddingTop: insets.top + 16, paddingHorizontal: 20, paddingBottom: 24, gap: 16 }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <View>
-          <Txt size={13} color={C.sub}>{monthLabel(now)}</Txt>
-          <Txt w="bold" size={22}>{name ? `Chào ${name}` : 'Xin chào'}</Txt>
+    <Screen
+      sub={dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1)}
+      title={greet}
+      right={
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          <IconButton name={data.settings.hideAmounts ? 'eyeOff' : 'eye'} label={L('Ẩn/hiện số tiền', 'Hide or show amounts')} onPress={() => updateSettings({ hideAmounts: !data.settings.hideAmounts })} size={40} />
+          <IconButton name="settings" label={L('Cài đặt', 'Settings')} onPress={() => router.navigate('/settings')} size={40} />
         </View>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Xem tất cả giao dịch"
-          onPress={() => router.push('/history')}
-          style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: C.line, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center' }}>
-          <Icon name="list" size={20} />
+      }>
+      {/* hero: left to spend today */}
+      <View style={{ backgroundColor: survival ? c.warn : c.accent, borderRadius: 24, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+        <Ring pct={s.daily ? s.leftToday / s.daily : 0} size={112} stroke={13} color={c.hi} track="rgba(255,255,255,0.22)">
+          <Txt w="bold" size={22} color="#FFFFFF">{s.daily ? Math.round((s.leftToday / s.daily) * 100) : 0}%</Txt>
+          <Txt size={12} color="rgba(255,255,255,0.85)">{L('còn lại', 'left')}</Txt>
+        </Ring>
+        <View style={{ flex: 1, gap: 2 }}>
+          <Txt size={13} color="rgba(255,255,255,0.88)">{L('Hôm nay còn tiêu được', 'Left to spend today')}</Txt>
+          <Txt w="bold" size={30} color="#FFFFFF" numberOfLines={1} adjustsFontSizeToFit style={{ lineHeight: 36 }}>{fmt(s.leftToday)}</Txt>
+          <Txt size={13} color="rgba(255,255,255,0.9)">
+            {survival
+              ? L(`Thiếu ${fmt(s.shortfall)} đến kỳ nhận tiền`, `${fmt(s.shortfall)} short until payday`)
+              : L(`Mỗi ngày ${fmt(s.daily)} · còn ${s.daysLeft} ngày tới ${ddmm(s.periodEnd)}`, `${fmt(s.daily)} a day · ${s.daysLeft} days until ${ddmm(s.periodEnd)}`)}
+          </Txt>
+        </View>
+      </View>
+
+      {survival && (
+        <Card style={{ backgroundColor: c.warnSoft, borderColor: c.warn, gap: 6 }}>
+          <Txt w="semibold" color={c.warnInk}>{L('Chế độ cứu nguy', 'Survival mode')}</Txt>
+          <Txt size={14} color={c.warnInk}>
+            {L(
+              `Tiền hiện có không đủ tới kỳ nhận tiền. Ưu tiên tiền phòng, điện nước, đi lại; tạm dừng mua sắm và giải trí. Mức tối thiểu gợi ý: ${fmt(Math.max(30_000, Math.floor((s.balance - s.reserved) / s.daysLeft / 1000) * 1000))}/ngày cho ăn uống.`,
+              `Your money won't last until payday. Pay rent, utilities and transport first; pause shopping and fun. Suggested minimum: ${fmt(Math.max(30_000, Math.floor((s.balance - s.reserved) / s.daysLeft / 1000) * 1000))}/day for food.`,
+            )}
+          </Txt>
+          <Txt size={13} color={c.warnInk}>{L('Tránh vay qua app cho vay lãi cao: phí và lãi thường rất nặng. Hỏi người thân hoặc trường trước.', 'Avoid high-interest lending apps: fees and interest are usually very heavy. Ask family or your school first.')}</Txt>
+        </Card>
+      )}
+
+      <View style={{ flexDirection: 'row', gap: 8 }}>
+        {[
+          { v: s.balance, l: L('Số dư', 'Balance'), go: '/wallets' as const },
+          { v: s.reserved, l: L('Giữ cho hóa đơn', 'Held for bills'), go: '/bills' as const },
+          { v: s.setAside, l: L('Đã để dành', 'Set aside'), go: '/budget' as const },
+        ].map((x) => (
+          <Pressable key={x.l} accessibilityRole="button" onPress={() => router.navigate(x.go)} style={{ flex: 1, backgroundColor: c.card, borderRadius: 18, padding: 10, borderWidth: 0.5, borderColor: c.line }}>
+            <Txt w="bold" size={15} numberOfLines={1} adjustsFontSizeToFit>{fmt(x.v)}</Txt>
+            <Txt size={12} color={c.sub} numberOfLines={2}>{x.l}</Txt>
+          </Pressable>
+        ))}
+      </View>
+
+      <View style={{ flexDirection: 'row', gap: 8 }}>
+        <Pressable accessibilityRole="button" onPress={() => router.navigate('/budget')} style={{ flex: 1, backgroundColor: c.card, borderRadius: 18, padding: 12, borderWidth: 0.5, borderColor: c.line, gap: 2 }}>
+          <Txt w="semibold" size={15}>{L('Ngân sách & mục tiêu', 'Budget & goals')}</Txt>
+          <Txt size={13} color={c.sub}>{L(`Đã chi ${short(m.expense)} / ${short(m.budget)}`, `Spent ${short(m.expense)} of ${short(m.budget)}`)}</Txt>
+        </Pressable>
+        <Pressable accessibilityRole="button" onPress={() => router.navigate('/bills')} style={{ flex: 1, backgroundColor: c.card, borderRadius: 18, padding: 12, borderWidth: 0.5, borderColor: c.line, gap: 2 }}>
+          <Txt w="semibold" size={15}>{L('Hóa đơn, nợ & gói', 'Bills, debts & plans')}</Txt>
+          <Txt size={13} color={c.sub}>{L(`Cần trả ${short(s.reserved)}`, `Due ${short(s.reserved)}`)}</Txt>
         </Pressable>
       </View>
 
-      <View style={{ backgroundColor: over ? C.danger : C.accent, borderRadius: 24, padding: 22, gap: 16 }}>
-        <View style={{ gap: 2 }}>
-          <Txt size={13} color="#FFFFFF" style={{ opacity: 0.9 }}>{over ? 'Đã vượt ngân sách tháng' : 'Còn lại để chi tháng này'}</Txt>
-          <Txt w="bold" size={34} color="#FFFFFF" style={{ lineHeight: 44 }}>{vnd(Math.abs(stats.remaining))}</Txt>
+      {data.templates.length > 0 && (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+          {data.templates.map((t) => {
+            const cat = data.categories.find((x) => x.id === t.categoryId);
+            return (
+              <Pressable
+                key={t.id}
+                accessibilityRole="button"
+                accessibilityLabel={L(`Ghi nhanh ${t.name}`, `Quick log ${t.name}`)}
+                onPress={() => addTransaction({ amount: t.amount, type: 'expense', categoryId: t.categoryId, walletId: data.wallets[0]?.id ?? 'cash', note: t.name, date: new Date().toISOString(), source: 'template' })}
+                style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 6, paddingLeft: 6, paddingRight: 12, borderRadius: 20, backgroundColor: c.card, borderWidth: 1, borderColor: c.line, opacity: pressed ? 0.6 : 1 })}>
+                {cat && <CategoryIcon id={cat.icon} color={cat.color} size={26} />}
+                <Txt size={13} w="medium">{t.name} · {short(t.amount)}</Txt>
+              </Pressable>
+            );
+          })}
         </View>
-        <View style={{ height: 8, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.25)', overflow: 'hidden' }}>
-          <View style={{ width: `${Math.min(1, usedPct) * 100}%`, height: 8, borderRadius: 4, backgroundColor: '#FFFFFF' }} />
-        </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <Txt size={13} color="#FFFFFF">Đã chi {vnd(stats.expense)}</Txt>
-          <Txt size={13} color="#FFFFFF">Ngân sách {vnd(stats.budget)}</Txt>
-        </View>
-      </View>
+      )}
 
-      <View style={{ flexDirection: 'row', gap: 12 }}>
-        <Card style={{ flex: 1, gap: 2, paddingVertical: 14 }}>
-          <Txt size={12} color={C.sub}>Thu nhập</Txt>
-          <Txt w="semibold" size={17} color={C.accent}>{vnd(stats.income, true)}</Txt>
+      <SpendCharts />
+
+      {s.due.length > 0 && (
+        <Card style={{ gap: 2 }}>
+          <Txt w="semibold" style={{ marginBottom: 4 }}>{L('Sắp đến hạn', 'Coming up')}</Txt>
+          {s.due.slice(0, 4).map((d, i, a) => (
+            <View key={d.kind + d.id} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 9, borderBottomWidth: i === a.length - 1 ? 0 : 1, borderBottomColor: c.lineSoft }}>
+              <View style={{ flex: 1 }}>
+                <Txt w="medium" numberOfLines={1}>{d.name}</Txt>
+                <Txt size={13} color={c.sub}>{d.days === 0 ? L('Hôm nay', 'Today') : L(`còn ${d.days} ngày · ${ddmm(d.due)}`, `in ${d.days} days · ${ddmm(d.due)}`)}</Txt>
+              </View>
+              <Txt w="semibold">{fmt(d.amount)}</Txt>
+            </View>
+          ))}
         </Card>
-        <Card style={{ flex: 1, gap: 2, paddingVertical: 14 }}>
-          <Txt size={12} color={C.sub}>Trung bình/ngày</Txt>
-          <Txt w="semibold" size={17}>{vnd(stats.avgPerDay)}</Txt>
-        </Card>
-      </View>
+      )}
 
       {insight && (
-        <View style={{ backgroundColor: warnTone ? C.warnSoft : C.accentSoft, borderWidth: 1, borderColor: warnTone ? C.warnBorder : '#BFE3D8', borderRadius: 18, padding: 16, flexDirection: 'row', gap: 12 }}>
-          <View style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: warnTone ? '#B4530F' : C.accent, alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name="spark" size={18} color="#FFFFFF" />
+        <Card style={{ backgroundColor: c.accentSoft, borderColor: c.accentSoft, gap: 4 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Icon name="spark" size={16} color={c.accent} />
+            <Txt w="semibold" color={c.accentInk}>{insight.title}</Txt>
           </View>
-          <View style={{ flex: 1, gap: 4 }}>
-            <Txt w="semibold" size={13} color={warnTone ? C.warnInk : C.accentInk}>AI nhận xét · {insight.title}</Txt>
-            <Txt size={13} color={warnTone ? '#3D2A1C' : C.accentInk}>{insight.text}</Txt>
-            <Pressable accessibilityRole="link" onPress={() => router.push('/assistant')} hitSlop={8}>
-              <Txt w="semibold" size={13} color={warnTone ? '#8A3D09' : C.accent}>Hỏi thêm trợ lý →</Txt>
-            </Pressable>
-          </View>
-        </View>
+          <Txt size={14}>{insight.text}</Txt>
+        </Card>
       )}
 
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Txt w="semibold" size={16}>Giao dịch gần đây</Txt>
-        {data.transactions.length > 0 && (
-          <Pressable accessibilityRole="link" onPress={() => router.push('/history')} hitSlop={10}>
-            <Txt w="medium" size={13} color={C.accent}>Xem tất cả</Txt>
+      <Card>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 2 }}>
+          <Txt w="semibold" style={{ flex: 1 }}>{L('Gần đây', 'Recent')}</Txt>
+          <Pressable accessibilityRole="button" onPress={() => router.navigate('/history')} hitSlop={8}>
+            <Txt size={13} w="semibold" color={c.accent}>{L('Xem tất cả', 'See all')}</Txt>
           </Pressable>
+        </View>
+        {data.transactions.length === 0 ? (
+          <Txt size={14} color={c.sub} style={{ paddingVertical: 8 }}>{L('Chưa có giao dịch. Bấm nút + để ghi khoản đầu tiên.', 'No transactions yet. Tap + to log your first one.')}</Txt>
+        ) : (
+          data.transactions.slice(0, 5).map((t, i, a) => <TxRow key={t.id} tx={t} last={i === a.length - 1} showDate />)
         )}
-      </View>
+      </Card>
 
-      {recent.length > 0 ? (
-        <Card style={{ paddingVertical: 4 }}>
-          {recent.map((t, i) => <TxRow key={t.id} tx={t} last={i === recent.length - 1} />)}
-        </Card>
-      ) : (
-        <Card style={{ gap: 12, alignItems: 'flex-start' }}>
-          <Txt color={C.sub}>Chưa có giao dịch. Bấm nút + ở giữa thanh dưới để thêm, hoặc tạo dữ liệu mẫu để thử app.</Txt>
-          <Btn label="Tạo dữ liệu mẫu" kind="secondary" onPress={loadSample} />
+      {data.wallets.length > 1 && (
+        <Card style={{ gap: 6 }}>
+          <Txt w="semibold">{L('Ví', 'Wallets')}</Txt>
+          {data.wallets.map((w) => (
+            <View key={w.id} style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Txt size={14} color={c.sub}>{w.name}</Txt>
+              <Txt size={14} w="semibold">{fmt(balances[w.id] ?? 0)}</Txt>
+            </View>
+          ))}
         </Card>
       )}
-
-      {stats.budget > 0 && stats.categories.some((c) => c.spent > 0) && (
-        <>
-          <Txt w="semibold" size={16}>Top danh mục tháng này</Txt>
-          <Card style={{ gap: 14 }}>
-            {stats.categories.filter((c) => c.spent > 0).slice(0, 3).map((c) => (
-              <View key={c.category.id} style={{ gap: 6 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Txt w="medium" size={13}>{c.category.name}</Txt>
-                  <Txt size={13} color={C.sub}>{vnd(c.spent)}</Txt>
-                </View>
-                <Progress pct={c.limit ? c.pct : 0} color={c.status === 'over' ? C.danger : c.status === 'warn' ? C.warn : C.accent} />
-              </View>
-            ))}
-          </Card>
-        </>
-      )}
-    </ScrollView>
+    </Screen>
   );
 }

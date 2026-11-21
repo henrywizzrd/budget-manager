@@ -1,82 +1,35 @@
-# MYX: app quản lý tiền có AI cho sinh viên
+# MYX: quản lý tiền cho sinh viên
 
-App quản lý chi tiêu cá nhân viết bằng **Expo (React Native) + TypeScript**. Bạn ghi chi tiêu bằng một câu tiếng Việt bình thường, AI tách thành từng giao dịch, xếp danh mục, theo dõi hạn mức và trả lời câu hỏi về thói quen chi tiêu.
+App quản lý tiền viết bằng **Expo SDK 58 (React Native) + TypeScript**, song ngữ Việt / Anh, dữ liệu lưu trên máy.
+Câu hỏi trung tâm của app: **"Hôm nay mình còn tiêu được bao nhiêu?"**
 
-## Tính năng
+## Tính năng (bản thử nghiệm)
 
 | Màn hình | Có gì |
 |---|---|
-| **Trang chủ** | Số tiền còn được chi trong tháng, thu nhập, mức chi trung bình/ngày, thẻ *AI nhận xét*, giao dịch gần đây, top danh mục |
-| **Thêm giao dịch (nút +)** | Gõ câu kiểu `trưa ăn bún bò 50k, chiều đổ xăng 80k, tối mua sách 120 nghìn` → AI tách ra 3 giao dịch, tự xếp danh mục và thời điểm. Có thêm chế độ nhập tay |
-| **Ngân sách** | Vòng % đã dùng, dự báo cuối tháng, hạn mức từng danh mục (chạm để sửa), cảnh báo sắp vượt hoặc đã vượt, xem lại các tháng trước |
-| **Trợ lý AI** | Hỏi kiểu “Tháng này tiêu cà phê bao nhiêu?”, “So sánh với tháng trước”, “Dự báo cuối tháng”, “Nên tiết kiệm ở đâu?” |
-| **Cài đặt** | Tên, API key Gemini (tùy chọn), tạo dữ liệu mẫu 6 tuần, xóa dữ liệu |
-| **Lịch sử** | Mọi giao dịch nhóm theo ngày, lọc thu/chi, chạm vào để xóa |
+| **Dock** | Thanh tab kính mờ (Trang chủ · Lịch sử · Trợ lý) + nút + tròn + chip "Hôm nay còn…" kèm ghi chú. Chạm để chuyển tab; ấn giữ rồi kéo để kính lúp chạy theo tay; cuộn xuống thì dock thu gọn. Cử chỉ và thông số lấy từ dock của app ZYX |
+| **Trang chủ** | Số tiền tiêu được hôm nay (tính theo số dư, hóa đơn/gói/trả góp sắp đến hạn, tiền để dành và ngày nhận tiền), chế độ cứu nguy khi thiếu tiền, mẫu chi một chạm, biểu đồ cột tuần/tháng + đường chi mỗi ngày, sắp đến hạn, gợi ý |
+| **Thêm giao dịch** | Gõ câu tiếng Việt hoặc tiếng Anh ("trưa bún bò 50k, xăng 80k", "lunch 50k, bus 7k"), chọn ví; MYX nhớ danh mục bạn sửa |
+| **Lịch sử** | Nhóm theo ngày, tìm không dấu, lọc thu/chi, xóa |
+| **Trợ lý** | "Mua … được không?", soát gói đăng ký, đặt hạn mức, tạo mục tiêu, ghi giao dịch: mọi thay đổi cần bấm Xác nhận. Offline miễn phí, Gemini nếu dán key |
+| **Ngân sách** | Hạn mức theo danh mục, mục tiêu + quỹ khẩn cấp có chuỗi ngày, chia hũ khi nhận tiền |
+| **Hóa đơn & nợ** | Hóa đơn định kỳ, gói đăng ký (nhắc trước 1/3/7 ngày, gửi thử thông báo), nợ và trả góp |
+| **Cài đặt** | Ngôn ngữ, sáng/tối, 6 theme, ẩn số tiền, khóa app (Face ID / vân tay), ngày nhận tiền, ví, tổng kết ngày/tuần, mẫu chi, recap tháng (chia sẻ ảnh), xuất CSV, Pro (giao diện), key Gemini |
 
-### AI hoạt động thế nào
+Chưa có trong bản này: tài khoản và đồng bộ cloud (Supabase), mua Pro thật, widget. Xem kế hoạch ở `specs/001-myx-v1/`.
 
-- **Offline (mặc định, miễn phí):** `src/lib/parser.ts` là bộ tách câu tiếng Việt. Nó hiểu `k`, `nghìn`, `tr`, `triệu`, `củ`, `1tr5`, `50.000đ`, số không đơn vị (`cafe 35` = 35.000đ), các mốc thời gian (`trưa nay`, `hôm qua`…), khoản thu (`lương`, `mẹ cho`…), và gõ không dấu vẫn được. Trợ lý offline (`src/lib/assistant.ts`) trả lời theo ý định câu hỏi.
-- **Gemini (tùy chọn):** vào **Cài đặt**, dán API key lấy miễn phí tại https://aistudio.google.com/app/apikey. Khi có key, việc tách câu và trợ lý sẽ dùng Gemini. Nếu Gemini lỗi, app tự quay về chế độ offline. Key chỉ lưu trên máy.
+## Cài bản thử
 
-Dữ liệu được lưu trên máy bằng AsyncStorage, không cần server.
+Push commit có `[build]` trong lời nhắn → GitHub Actions tạo bản Release (APK cho Android, IPA chưa ký cho iPhone: ký và cài bằng ESign / Sideloadly).
 
-## Chạy thử trên iPhone (Expo Go)
-
-Cần: **Node.js 20+** trên máy tính và app **Expo Go** trên iPhone (cài từ App Store).
+## Phát triển
 
 ```bash
-git clone https://github.com/henrywizzrd/myx.git
-cd myx
 npm install
-npx expo start
+npx expo start          # chạy dev (cần development build vì có module native)
+npx tsc --noEmit        # kiểm tra kiểu
+npm test                # test bộ tách câu và công thức tính tiền
+node scripts/gen-icons.mjs   # tạo lại dữ liệu icon từ design/icons/icons.json
 ```
 
-1. Terminal sẽ hiện mã QR.
-2. Trên iPhone, mở **Camera** và quét QR, máy sẽ mở Expo Go (Android thì quét bằng chính Expo Go).
-3. Điện thoại và máy tính phải dùng **cùng mạng Wi-Fi**. Nếu không kết nối được (Wi-Fi công ty hoặc trường hay chặn), chạy `npx expo start --tunnel`.
-4. Lần đầu vào app, mở **Cài đặt → Tạo dữ liệu mẫu** để có số liệu test.
-
-Chạy trên trình duyệt: `npx expo start --web` (hoặc nhấn `w` trong terminal).
-
-> Expo Go trên App Store chỉ chạy được SDK mới nhất. Project này dùng **Expo SDK 58**. Nếu Expo Go báo lệch phiên bản, hãy cập nhật Expo Go.
-
-## Lệnh hữu ích
-
-```bash
-npm start           # dev server
-npm run web         # chạy bản web
-npm run typecheck   # kiểm tra TypeScript
-npm test            # test bộ tách câu tiếng Việt (scripts/test-parser.ts)
-```
-
-## Cấu trúc thư mục
-
-```
-src/
-  app/                    # Expo Router: mỗi file là một màn hình
-    _layout.tsx           # root: font, store, stack (modal "add", "history")
-    (tabs)/_layout.tsx    # thanh tab dưới + nút + ở giữa
-    (tabs)/index.tsx      # Trang chủ
-    (tabs)/budget.tsx     # Ngân sách
-    (tabs)/assistant.tsx  # Trợ lý AI
-    (tabs)/settings.tsx   # Cài đặt
-    add.tsx               # Thêm giao dịch (AI + nhập tay)
-    history.tsx           # Tất cả giao dịch
-  components/             # UI dùng chung (Txt, Card, Btn, Icon, Sheet, TxRow…)
-  lib/
-    parser.ts             # tách câu tiếng Việt → giao dịch (offline)
-    categories.ts         # danh mục mặc định + từ khóa nhận diện
-    insights.ts           # thống kê tháng, dự báo, nhận xét
-    assistant.ts          # trợ lý offline
-    gemini.ts             # gọi Gemini API (tùy chọn)
-    store.tsx             # state + lưu AsyncStorage
-    sample.ts             # dữ liệu mẫu
-scripts/test-parser.ts    # test cho parser
-```
-
-## Hướng phát triển tiếp
-
-- Quét hóa đơn bằng camera (OCR)
-- Màn báo cáo biểu đồ theo tháng
-- Backend và đồng bộ nhiều thiết bị (Node/NestJS + PostgreSQL)
-- Build file cài đặt thật bằng EAS (`npx eas-cli build`)
+Thiết kế: bản mẫu HTML ở `design/prototype/index.html`, bộ icon ở `design/icons/` (60 icon từ Phosphor Icons, MIT).

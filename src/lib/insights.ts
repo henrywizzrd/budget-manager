@@ -1,5 +1,9 @@
 import { daysInMonth, sameMonth, vnd } from './format';
-import { Category, Transaction } from './types';
+import { Category, Lang, Transaction } from './types';
+
+const tr = (lang: Lang, vi: string, en: string) => (lang === 'en' ? en : vi);
+const money = (lang: Lang, n: number) => (lang === 'en' ? vnd(n).replace(/\./g, ',').replace('đ', '₫') : vnd(n));
+const cname = (c: Category, lang: Lang) => (lang === 'en' ? c.nameEn : c.name);
 
 export interface CategoryStat {
   category: Category;
@@ -40,6 +44,7 @@ export function monthStats(
   y: number,
   m: number,
   now = new Date(),
+  lang: Lang = 'vi',
 ): MonthStats {
   const list = txInMonth(txs, y, m);
   const daysTotal = daysInMonth(y, m);
@@ -71,15 +76,15 @@ export function monthStats(
     if (c.limit > 0) {
       if (spent > c.limit) {
         status = 'over';
-        note = `Đã vượt ${vnd(spent - c.limit)}`;
+        note = tr(lang, `Đã vượt ${money(lang, spent - c.limit)}`, `Over by ${money(lang, spent - c.limit)}`);
       } else if (isCurrent && forecast > c.limit && spent > 0) {
         status = 'warn';
         const perDay = spent / Math.max(daysElapsed, 1);
         const day = Math.min(daysTotal, Math.ceil(c.limit / perDay));
-        note = `Dự báo vượt hạn mức vào khoảng ngày ${day}`;
+        note = tr(lang, `Dự báo vượt hạn mức vào khoảng ngày ${day}`, `Likely over the limit around day ${day}`);
       } else if (pct >= 0.8 && !fixed) {
         status = 'warn';
-        note = `Đã dùng ${Math.round(pct * 100)}% hạn mức`;
+        note = tr(lang, `Đã dùng ${Math.round(pct * 100)}% hạn mức`, `${Math.round(pct * 100)}% of the limit used`);
       }
     }
     return { category: c, spent, limit: c.limit, pct, forecast, status, note };
@@ -131,20 +136,20 @@ export interface Insight {
 }
 
 /** Short, rule-based observations for the home card. Most important first. */
-export function buildInsights(txs: Transaction[], categories: Category[], now = new Date()): Insight[] {
+export function buildInsights(txs: Transaction[], categories: Category[], now = new Date(), lang: Lang = 'vi'): Insight[] {
   const out: Insight[] = [];
-  const s = monthStats(txs, categories, now.getFullYear(), now.getMonth(), now);
+  const s = monthStats(txs, categories, now.getFullYear(), now.getMonth(), now, lang);
   if (s.txs.length === 0) {
-    return [{ tone: 'info', title: 'Bắt đầu thôi', text: 'Chưa có giao dịch nào tháng này. Bấm nút + rồi gõ kiểu "cafe 35k, grab 40k" để AI ghi giúp bạn.' }];
+    return [{ tone: 'info', title: tr(lang, 'Bắt đầu thôi', "Let's start"), text: tr(lang, 'Chưa có giao dịch nào tháng này. Bấm nút + rồi gõ kiểu "cafe 35k, grab 40k" để AI ghi giúp bạn.', 'No transactions this month yet. Tap + and type something like "coffee 35k, bus 7k".') }];
   }
 
   const over = s.categories.filter((c) => c.status === 'over');
   const warn = s.categories.filter((c) => c.status === 'warn');
   for (const c of over.slice(0, 1)) {
-    out.push({ tone: 'warn', title: `${c.category.name} đã vượt hạn mức`, text: `Bạn đã chi ${vnd(c.spent)} trên hạn mức ${vnd(c.limit)}. Cân nhắc giảm mục này trong những ngày còn lại.` });
+    out.push({ tone: 'warn', title: tr(lang, `${c.category.name} đã vượt hạn mức`, `${c.category.nameEn} is over its limit`), text: tr(lang, `Bạn đã chi ${money(lang, c.spent)} trên hạn mức ${money(lang, c.limit)}. Cân nhắc giảm mục này trong những ngày còn lại.`, `You spent ${money(lang, c.spent)} of a ${money(lang, c.limit)} limit. Try to cut back here for the rest of the month.`) });
   }
   for (const c of warn.slice(0, 1)) {
-    out.push({ tone: 'warn', title: `Để ý mục ${c.category.name}`, text: `${c.note}. Hiện đã chi ${vnd(c.spent)} / ${vnd(c.limit)}.` });
+    out.push({ tone: 'warn', title: tr(lang, `Để ý mục ${c.category.name}`, `Watch ${c.category.nameEn}`), text: tr(lang, `${c.note}. Hiện đã chi ${money(lang, c.spent)} / ${money(lang, c.limit)}.`, `${c.note}. Spent ${money(lang, c.spent)} of ${money(lang, c.limit)}.`) });
   }
 
   // Week over week change for the biggest category
@@ -158,16 +163,16 @@ export function buildInsights(txs: Transaction[], categories: Category[], now = 
     const a = spendBetween(txs, thisWeek, new Date(now.getTime() + 1), c.category.id);
     const b = spendBetween(txs, lastWeek, lastWeekSameSpan, c.category.id);
     if (b > 0 && a > b * 1.3 && a - b > 50_000) {
-      out.push({ tone: 'info', title: `${c.category.name} tăng mạnh`, text: `Tuần này bạn chi ${vnd(a)} cho ${c.category.name.toLowerCase()}, cao hơn ${Math.round((a / b - 1) * 100)}% so với cùng kỳ tuần trước.` });
+      out.push({ tone: 'info', title: tr(lang, `${c.category.name} tăng mạnh`, `${c.category.nameEn} is up`), text: tr(lang, `Tuần này bạn chi ${money(lang, a)} cho ${c.category.name.toLowerCase()}, cao hơn ${Math.round((a / b - 1) * 100)}% so với cùng kỳ tuần trước.`, `You spent ${money(lang, a)} on ${c.category.nameEn.toLowerCase()} this week, ${Math.round((a / b - 1) * 100)}% more than the same days last week.`) });
       break;
     }
   }
 
   if (s.budget > 0) {
     if (s.forecast > s.budget) {
-      out.push({ tone: 'warn', title: 'Dự báo cuối tháng', text: `Với nhịp chi hiện tại, cuối tháng bạn sẽ tiêu khoảng ${vnd(s.forecast)}, vượt ngân sách ${vnd(s.forecast - s.budget)}.` });
+      out.push({ tone: 'warn', title: tr(lang, 'Dự báo cuối tháng', 'Month-end forecast'), text: tr(lang, `Với nhịp chi hiện tại, cuối tháng bạn sẽ tiêu khoảng ${money(lang, s.forecast)}, vượt ngân sách ${money(lang, s.forecast - s.budget)}.`, `At this pace you'll spend about ${money(lang, s.forecast)} this month, ${money(lang, s.forecast - s.budget)} over budget.`) });
     } else if (out.length === 0) {
-      out.push({ tone: 'good', title: 'Đang đi đúng hướng', text: `Dự báo cuối tháng bạn tiêu khoảng ${vnd(s.forecast)}, vẫn trong ngân sách ${vnd(s.budget)}. Mỗi ngày còn chi được khoảng ${vnd(s.safePerDay)}.` });
+      out.push({ tone: 'good', title: tr(lang, 'Đang đi đúng hướng', 'On track'), text: tr(lang, `Dự báo cuối tháng bạn tiêu khoảng ${money(lang, s.forecast)}, vẫn trong ngân sách ${money(lang, s.budget)}.`, `You're on course to spend about ${money(lang, s.forecast)}, within your ${money(lang, s.budget)} budget.`) });
     }
   }
   return out;
