@@ -1,0 +1,145 @@
+# MYX: chép từ workflow của app ZYX (cùng Expo SDK 58), đổi tên file và scheme.
+# Đóng gói app để cài thử. Cách chạy:
+#  - push một commit có chữ [build] trong lời nhắn commit (chạy được trên mọi nhánh), hoặc
+#  - push một commit có chữ [update]: KHÔNG build lại, chỉ đẩy code JS mới lên Expo (EAS Update) → app đã cài tự cập nhật
+#    (cần chạy `npx eas-cli@latest init` một lần để gắn projectId vào app.json, và secret EXPO_TOKEN trong
+#    Settings → Secrets and variables → Actions)
+#  - tab Actions -> "Build test apps" -> Run workflow (nút này chỉ hiện khi file này đã có trên nhánh main)
+#  - Android: file APK cài thẳng lên máy (ký bằng khoá debug, chỉ để thử nghiệm)
+#  - iOS: file IPA CHƯA KÝ -> dùng Sideloadly + Apple ID (miễn phí) để ký và cài lên iPhone
+# Xong thì tải 2 file ở mục "Artifacts" cuối trang của lần chạy
+name: Build test apps
+
+on:
+  workflow_dispatch:
+  push:
+
+# Push bình thường thì 2 job bên dưới bị bỏ qua (không tốn gì), chỉ build khi lời nhắn commit có [build]
+
+jobs:
+  # Kiểm tra nhanh mỗi lần push (mọi commit): typecheck. Lint và unit test thêm vào khi cấu hình xong (tasks T003, T004)
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx tsc --noEmit
+
+  android:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[build]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: zulu
+          java-version: 17
+      - run: npm ci
+      - run: npx expo prebuild --platform android --no-install
+      - name: Build APK
+        working-directory: android
+        # Chỉ build cho chip arm64 (mọi điện thoại Android vài năm gần đây) cho nhanh và nhẹ.
+        # Tắt R8 (thu gọn mã Java): trên app ZYX cùng SDK 58, R8 xoá nhầm hàm của expo-modules làm app văng khi mở
+        run: ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a,x86_64 -Pandroid.enableMinifyInReleaseBuilds=false --no-daemon
+      - run: mv android/app/build/outputs/apk/release/app-release.apk MYX.apk
+      - uses: actions/upload-artifact@v5
+        with:
+          name: MYX-android
+          path: MYX.apk
+
+  ios:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[build]')
+    runs-on: macos-26
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v5
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx expo prebuild --platform ios
+      - name: Build (không ký)
+        run: |
+          set -o pipefail
+          xcodebuild -version
+          xcodebuild -workspace ios/MYX.xcworkspace -scheme MYX -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' -archivePath build/MYX.xcarchive archive \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" > xcodebuild.log 2>&1 \
+            || { echo "=== CÁC DÒNG LỖI ==="; grep -nE "error:|\*\* ARCHIVE FAILED|fatal" xcodebuild.log | head -n 60; echo "=== 80 DÒNG CUỐI ==="; tail -n 80 xcodebuild.log; exit 1; }
+      - name: Lưu log build iOS (để xem lỗi)
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: ios-build-log
+          path: xcodebuild.log
+          if-no-files-found: ignore
+      - name: Đóng gói IPA
+        run: |
+          mkdir -p Payload
+          cp -R build/MYX.xcarchive/Products/Applications/MYX.app Payload/
+          zip -qry MYX-unsigned.ipa Payload
+      - uses: actions/upload-artifact@v5
+        with:
+          name: MYX-ios
+          path: MYX-unsigned.ipa
+
+  # Gom 2 file vào một bản Release (trang chính repo -> Releases ở cột phải): tải thẳng, không bị nén zip
+  release:
+    needs: [android, ios]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          path: out
+          merge-multiple: true
+      # Dùng gh (có sẵn trên máy build) thay cho action cũ: action đó hay lỗi giữa chừng khi tải nhiều file lên cùng lúc
+      - name: Tạo Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: test-build-${{ github.run_number }}
+        run: |
+          gh release create "$TAG" out/MYX.apk out/MYX-unsigned.ipa \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+            --title "MYX test build ${{ github.run_number }}" \
+            --notes "Bản build thử nghiệm từ nhánh \`$GITHUB_REF_NAME\` (commit $GITHUB_SHA).
+          - Android: tải \`MYX.apk\` rồi cài thẳng lên máy.
+          - iPhone: tải \`MYX-unsigned.ipa\`, ký và cài bằng ESign / Sideloadly."
+
+  # Cập nhật qua mạng (EAS Update): app đã cài tự tải bản mới, không cần cài lại.
+  # Chỉ dùng được cho thay đổi JS / ảnh. Thêm thư viện native, đổi icon, tên app, quyền... thì phải [build] lại
+  update:
+    if: github.event_name == 'push' && contains(github.event.head_commit.message, '[update]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Đẩy riêng iOS và Android (không đóng gói bản web)
+      - name: Đẩy bản cập nhật lên kênh preview
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          MSG: ${{ github.event.head_commit.message }}
+          CI: 1
+        run: |
+          npx --yes eas-cli@latest update --channel preview --platform ios --message "$MSG" --non-interactive
+          npx --yes eas-cli@latest update --channel preview --platform android --message "$MSG" --non-interactive
