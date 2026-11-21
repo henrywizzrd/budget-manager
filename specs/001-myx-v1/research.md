@@ -86,3 +86,29 @@ against docs yet and MUST be checked (Constitution VI) before code is written.
 - **Decision**: Jest via `jest-expo` for unit tests of pure logic (parser VI/EN, safe-to-spend,
   sync merge, i18n completeness, theme contrast); manual acceptance on release builds following
   `quickstart.md`. (**verify at implementation**: jest-expo setup for SDK 58.)
+
+## R10. Dock (from the owner's ZYX app)
+
+- **Decision**: port `AppleDock.tsx` / `dockCollapse.ts` from `henrywizzrd/zyx` (branch
+  `feature/player`, commit 1d700b4) and keep its numbers: bar height 62, chip 52, gaps 10/8, springs
+  420/32 (pill), 600/38 (lens), 600/28 (press), 300/28 (collapse), hold 170 ms, lens scale 1.18.
+  Liquid Glass (`expo-glass-effect`) only on always-visible chrome; the lens and chip use `expo-blur`
+  because Liquid Glass disappears when it or a parent has opacity below 1.
+
+## R11. Widgets
+
+- **Decision**: `expo-widgets` (SDK 58). Docs: Android and iOS supported, Android opt-in; timelines,
+  configurable widgets and Live Activities are iOS-only; widgets are TSX using `@expo/ui` components,
+  cannot use hooks or app state, and get data via `updateSnapshot`; not available in Expo Go.
+
+## R12. App lock and sharing
+
+- **Decision**: `expo-local-authentication` for biometrics/PIN; `react-native-view-shot` +
+  `expo-sharing` for the monthly recap image (**verify at implementation**).
+
+## R13. v2 items needing a library review
+
+- Text recognition (receipts) and speech-to-text: no official Expo module (`expo-speech` is
+  text-to-speech only), so a third-party library must be chosen and approved first.
+- Reading other apps' notifications on Android needs a custom native module and must pass Google
+  Play's policy for that permission.

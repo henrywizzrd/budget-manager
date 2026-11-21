@@ -19,8 +19,10 @@ RevenueCat. Test builds come from the owner's existing `[build]` GitHub Actions 
 
 **Primary Dependencies**: expo-router, expo-sqlite, @supabase/supabase-js, expo-localization,
 expo-notifications, expo-apple-authentication, native Google sign-in (library verified at
-implementation), react-native-purchases (RevenueCat), existing react-native-svg and Be Vietnam Pro
-fonts
+implementation), react-native-purchases (RevenueCat), react-native-reanimated 4.7.1 + react-native-worklets 0.13.0,
+react-native-gesture-handler ~3.3.0, expo-haptics, expo-blur, expo-glass-effect (same versions as the
+owner's ZYX app on SDK 58), expo-local-authentication, expo-widgets, react-native-view-shot +
+expo-sharing, Sentry, existing react-native-svg and Be Vietnam Pro fonts
 
 **Storage**: SQLite on device (source of truth for the UI); Supabase Postgres for sync
 
@@ -100,7 +102,9 @@ src/
 │   ├── supabase.ts  auth.ts  notifications.ts  purchases.ts  cloudAssistant.ts
 ├── i18n/                     # new: vi.ts, en.ts, index.ts (t(), useLanguage)
 ├── theme/                    # new: tokens.ts, themes/*.ts, ThemeProvider.tsx
-└── components/               # shared UI moved out of screens
+├── components/               # shared UI moved out of screens
+│   └── dock/                 # MyxDock, TodayChip, Glass, dockCollapse, haptics, useContentInsets
+└── widgets/                  # expo-widgets widget components
 
 supabase/
 ├── migrations/*.sql
@@ -117,22 +121,24 @@ tests/unit/                   # parser, safeToSpend, sync merge, actions, i18n, 
 stays in `src/lib` (testable without React Native); storage in `src/data`; side-effectful
 integrations in `src/services`. `ios/` and `android/` stay generated (Constitution VI).
 
-## Delivery Milestones (each = one `[build]` prerelease for the owner to test)
+## Delivery Milestones (each = one `[build]` or `[update]` release for the owner to test)
 
 | # | Milestone | Covers | Owner tests |
 |---|---|---|---|
-| M0 | Foundation: CI release workflow, Jest, theme tokens + i18n skeleton, legacy screens migrated to tokens and `t()` | Constitution VII, FR-028–030 base | Install APK/IPA; switch VI/EN and light/dark |
-| M1 | SQLite storage + legacy data migration | FR-006, FR-007 | Old data still there after update |
-| M2 | Safe-to-spend + onboarding + income sources | US1, FR-001–003 | quickstart #1 |
-| M3 | Bilingual parser + quick entry review | US2, FR-004–005 | quickstart #2–3 |
-| M4 | Supabase: auth (email, Apple, Google), sync, export, delete account | US3, FR-008–014 | quickstart #4, #5, #12 |
-| M5 | Bills, debts, installments + local notifications | US4, FR-015–017, FR-026–027 | quickstart #6–7 |
-| M6 | Budgets, goals, emergency fund + reports | US5, US8, FR-018–020, FR-031 | quickstart #8 |
-| M7 | AI agent: offline actions, BYO key, cloud Edge Function with confirmation cards | US6, FR-021–025 | quickstart #9–10 |
-| M8 | Theme gallery + Pro (RevenueCat), store listings, privacy labels, submission | US7, US9, FR-032–034 | quickstart #11, #13; store sandbox purchase |
+| M0 | Foundation: CI release workflow, bundle ids, Jest, theme tokens, i18n, MYX icon set, ZYX-style dock (a static glass, b sliding pill, c lens, d collapse, f haptics/reduced motion/insets), tabs Home/History/Assistant with Budget and Bills under Home, Sentry | US10, FR-035–041, FR-056 | Install APK/IPA; tap, hold-drag, fast flick, scroll down/up |
+| M1 | SQLite storage, legacy data migration, wallets and transfers, templates | FR-006, FR-007, FR-042, FR-044 | Old data kept; wallet totals |
+| M2 | Safe-to-spend, onboarding, income sources, jar split, today chip and note, survival mode | US1, US11, US15, FR-001–003, FR-043, FR-053 | quickstart #1, jar split |
+| M3 | Bilingual parser, quick entry review, category learning | US2, FR-004–005, FR-052 | quickstart #2–3 |
+| M4 | Supabase auth, sync, export, delete account, app lock, hidden amounts | US3, US12, FR-008–014, FR-045–046 | quickstart #4, #5, #12; lock |
+| M5 | Bills, debts, subscriptions with reminders, daily and weekly recap | US4, US17, US13, FR-015–017, FR-026–027, FR-047, FR-055 | quickstart #6–7; renewal reminder |
+| M6 | Budgets, goals, history, charts, monthly recap card | US5, US8, FR-018–020, FR-031, FR-039–040, FR-048 | quickstart #8; share card |
+| M7 | AI agent: actions, affordability, subscription audit, anomalies | US6, US14, FR-021–025, FR-049–051 | quickstart #9–10 |
+| M8 | Widgets (expo-widgets: iOS home/lock, Android home) | US16, FR-054 | widget updates |
+| M9 | Theme gallery, Pro (RevenueCat), store listings, privacy labels, submission | US7, US9, FR-032–034 | quickstart #11, #13 |
+| v2 | Receipt scan, voice entry, Android bank notifications, group split + VietQR, micro-lessons | Later stories | Each needs a library review first |
 
-M4 needs the owner to create a Supabase project and share its URL and publishable key; M8 needs
-paid Apple Developer and Google Play accounts and a RevenueCat account.
+M4 needs a Supabase project (URL and publishable key); `[update]` needs `eas init` and an
+`EXPO_TOKEN` secret; M9 needs paid Apple Developer and Google Play accounts and a RevenueCat account.
 
 ## Complexity Tracking
 

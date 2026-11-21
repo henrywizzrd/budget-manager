@@ -215,6 +215,153 @@ and confirm Pro features unlock on all signed-in devices; restore purchase works
 
 ---
 
+### User Story 10 - Navigation dock and today chip (Priority: P1)
+
+The app has a floating frosted dock with three tabs (Home, History, Assistant) and a separate round
+"+" button. Above it, a chip shows "Left today" with a small progress ring and a one-line note: a
+pen icon with "Note" when empty, or the user's own note. Pressing and holding the tab bar turns the
+selection into a magnifier lens that follows the finger and snaps to the nearest tab on release.
+Scrolling down collapses the bar into a round button and tucks the chip beside it; scrolling up
+expands it again. Budget and Bills open from Home.
+
+**Why this priority**: It is how every screen is reached and keeps the key number always visible.
+
+**Independent Test**: Switch tabs by tap and by hold-drag, scroll a long screen down and up, write
+and clear a note.
+
+**Acceptance Scenarios**:
+
+1. **Given** the Home tab, **When** the user holds the bar and drags to History and releases,
+   **Then** History opens and exactly one haptic tick fired per tab crossed.
+2. **Given** a long list, **When** the user scrolls down, **Then** the dock collapses; **When** they
+   scroll up or reach the top, **Then** it expands.
+3. **Given** no note, **When** the user taps the chip and saves "cook at home tonight", **Then** the
+   chip shows that note under the remaining amount.
+4. **Given** Reduce Motion is on, **When** tabs change, **Then** there is no stretch, lens or
+   overshoot, but the new selection is visible immediately.
+
+---
+
+### User Story 11 - Several wallets and money jars (Priority: P1)
+
+The user keeps money in cash, a bank account and e-wallets. Each transaction belongs to a wallet,
+transfers between wallets are not counted as spending, and the total balance is the sum. When
+income arrives, the user can split it into jars (for example food 50%, study 10%, savings 10%) with
+one tap using a saved split.
+
+**Why this priority**: Without wallets the balance is wrong for most users, which breaks
+safe-to-spend.
+
+**Independent Test**: Create three wallets, transfer between two, log income and apply a jar split.
+
+**Acceptance Scenarios**:
+
+1. **Given** 500,000đ cash and 2,000,000đ in the bank, **When** the user moves 300,000đ from bank
+   to cash, **Then** the total stays 2,500,000đ and no expense is recorded.
+2. **Given** a saved split, **When** 4,000,000đ income is logged, **Then** MYX proposes the jar
+   amounts and applies them after confirmation.
+
+---
+
+### User Story 12 - Privacy lock and hidden amounts (Priority: P1)
+
+The user can require Face ID, fingerprint or a PIN to open MYX, and can hide all amounts with one
+tap (shown as •••) when using the app in public.
+
+**Independent Test**: Enable the lock, background the app, reopen and unlock; toggle hidden amounts.
+
+**Acceptance Scenarios**:
+
+1. **Given** the lock is on, **When** the app returns from the background after the chosen delay,
+   **Then** content is covered until the user authenticates.
+2. **Given** hidden amounts, **When** any screen or widget renders, **Then** money values are masked.
+
+---
+
+### User Story 13 - Daily and weekly recap, monthly story (Priority: P2)
+
+Each evening MYX sends a short recap (spent today, left over, streak). On Sunday a weekly summary
+arrives. At month end the user gets a shareable recap card (top categories, biggest saving, streak)
+they can post as an image.
+
+**Independent Test**: With sample data, trigger the daily and weekly recap and generate the monthly
+card image.
+
+**Acceptance Scenarios**:
+
+1. **Given** recap time 21:00, **When** it is 21:00, **Then** a notification shows today's spending
+   and remaining amount in the user's language.
+2. **Given** month end, **When** the user opens the recap, **Then** they can share it as an image
+   that contains no account details.
+
+---
+
+### User Story 14 - Smarter assistant tools (Priority: P2)
+
+The assistant can answer "Can I afford it?" (impact of a purchase on the daily allowance or how many
+weeks of saving it needs), audit subscriptions (yearly total, plans not touched for a while), spot
+unusual spending ("eating out doubled this week") and learn from category corrections.
+
+**Independent Test**: Ask about a 2,000,000đ purchase, open the subscription audit, change a
+category twice and confirm the third similar entry is auto-categorised.
+
+**Acceptance Scenarios**:
+
+1. **Given** 203,500đ per day and 10 days left, **When** the user asks if they can buy a 500,000đ
+   item now, **Then** MYX shows the new daily amount (153,500đ) and an alternative saving plan.
+2. **Given** three subscriptions, **When** the audit opens, **Then** it shows the monthly and yearly
+   totals and the next renewal of each.
+
+---
+
+### User Story 15 - Survival mode (Priority: P2)
+
+When money will not last until payday, MYX switches Home into a calm survival mode: a minimum daily
+plan, which bills can wait and which cannot, and a clear warning about high-interest lending apps.
+
+**Acceptance Scenarios**:
+
+1. **Given** a shortfall, **When** Home opens, **Then** survival mode shows a daily minimum and
+   never suggests borrowing from lending apps.
+
+---
+
+### User Story 16 - Home screen and lock screen widget (Priority: P2)
+
+The user adds a MYX widget showing "Left today" and the next bill. It updates after each change and
+respects hidden amounts.
+
+**Acceptance Scenarios**:
+
+1. **Given** the widget is added, **When** an expense is logged, **Then** the widget shows the new
+   amount within a few seconds.
+
+---
+
+### User Story 17 - Subscription reminders (Priority: P1)
+
+The user adds paid subscriptions (name, type icon, price, monthly or yearly, next renewal date) and
+chooses to be reminded 1, 3 or 7 days before renewal. Upcoming renewals before payday are reserved
+in safe-to-spend.
+
+**Acceptance Scenarios**:
+
+1. **Given** Apple Music renews on 26/11 with a 3-day reminder, **When** it is 23/11, **Then** a
+   notification says it renews in 3 days and how much will be charged.
+
+---
+
+### Later (v2) stories, kept here so the design leaves room for them
+
+- **Receipt scan**: photograph a receipt and prefill the transaction.
+- **Voice entry**: speak "lunch fifty k" and get the same review as typed entry.
+- **Android bank notifications**: read banking-app notifications to log transactions automatically
+  (opt-in, Android only).
+- **Group split with VietQR**: split a bill with friends, track who paid, share a payment QR.
+- **Micro-lessons**: short money lessons for students, unlocked by streaks.
+
+---
+
 ### Edge Cases
 
 - Payday is today or already passed: the user is prompted to set the next payday; the allowance
@@ -330,6 +477,58 @@ and confirm Pro features unlock on all signed-in devices; restore purchase works
 - **FR-034**: The app MUST NOT display advertising for loans, credit, "buy now pay later", gambling or
   crypto.
 
+**Navigation and UI**
+
+- **FR-035**: The app MUST use a floating frosted dock with tabs Home, History and Assistant, a separate
+  round add button, and a today chip (remaining amount, progress ring, note) above it.
+- **FR-036**: Holding or dragging on the dock MUST show a magnifier lens that follows the finger and
+  snaps to the nearest tab; tapping MUST slide the selection; one haptic per tab change.
+- **FR-037**: The dock MUST collapse when scrolling down and expand when scrolling up or at the top.
+- **FR-038**: All motion MUST respect Reduce Motion and Reduce Transparency settings.
+- **FR-039**: History MUST list transactions grouped by day with search (accent-insensitive) and
+  income/expense filters, and allow deleting a transaction with all totals updated.
+- **FR-040**: Home MUST show weekly and monthly spending as a bar chart and daily spending as a line
+  chart with the safe daily level.
+- **FR-041**: Categories MUST use the MYX icon set (two-tone icons in coloured tiles, VI/EN names).
+
+**Wallets, jars and templates**
+
+- **FR-042**: Users MUST be able to create wallets (cash, bank, e-wallet, other), assign each
+  transaction to a wallet and transfer between wallets without counting it as spending.
+- **FR-043**: Users MUST be able to save an income split into jars and apply it when income arrives.
+- **FR-044**: Users MUST be able to save quick templates and log one with a single tap.
+
+**Privacy**
+
+- **FR-045**: Users MUST be able to lock the app with device biometrics or a PIN, with a selectable
+  re-lock delay.
+- **FR-046**: Users MUST be able to hide all money amounts across the app and widgets.
+
+**Recaps**
+
+- **FR-047**: System MUST send an optional daily recap at a user-chosen time and a weekly summary.
+- **FR-048**: System MUST generate a monthly recap card that can be shared as an image without
+  account identifiers.
+
+**Assistant tools**
+
+- **FR-049**: The assistant MUST answer affordability questions using the safe-to-spend model.
+- **FR-050**: The assistant MUST provide a subscription audit with monthly and yearly totals.
+- **FR-051**: System MUST flag unusual spending versus the user's recent weeks.
+- **FR-052**: Category suggestions MUST learn from the user's corrections on the device.
+
+**Survival, widgets, subscriptions**
+
+- **FR-053**: When a shortfall exists, Home MUST switch to survival mode (FR-003, FR-024 apply).
+- **FR-054**: The app MUST offer a home-screen widget (iOS and Android) and, on iOS, a lock-screen
+  widget showing the remaining amount today and the next due item.
+- **FR-055**: Users MUST be able to add subscriptions with cycle, next renewal date and a reminder
+  1, 3 or 7 days before, editable and deletable; renewals due before payday are reserved.
+
+**Operations**
+
+- **FR-056**: The app MUST report crashes and errors (no money amounts or personal text in reports).
+
 ### Key Entities
 
 - **User / Profile**: an account or guest; language, currency, appearance, theme, Pro status.
@@ -344,6 +543,14 @@ and confirm Pro features unlock on all signed-in devices; restore purchase works
 - **Savings Goal**: name, target, deadline, contributions; one goal may be marked as emergency fund.
 - **Assistant Conversation**: messages and proposed actions with their confirmed or rejected state.
 - **Theme**: identifier, color tokens for light and dark, free or Pro.
+
+- **Wallet**: name, type (cash/bank/e-wallet/other), currency, archived flag; balance is derived.
+- **Transfer**: from wallet, to wallet, amount, date.
+- **Jar Split**: name, list of (category or goal, percent).
+- **Template**: name, amount, category, wallet.
+- **Subscription**: name, type icon, price, cycle, next renewal date, reminder lead days, enabled.
+- **Daily Note**: date, text (one line, max 80 characters).
+- **Category Rule**: learned mapping from words to category.
 
 ## Success Criteria *(mandatory)*
 
@@ -363,6 +570,11 @@ and confirm Pro features unlock on all signed-in devices; restore purchase works
 - **SC-008**: All core features (FR-033) are usable by a free user with no paywall in a full test
   pass.
 
+- **SC-009**: Dock interactions run at the display's frame rate on an iPhone 16 Pro Max and a
+  mid-range Android, with no dropped frames during hold-drag in a 10-second test.
+- **SC-010**: The widget reflects a new expense within 10 seconds in testing.
+- **SC-011**: With the app lock on, no money amount is visible in the app switcher snapshot.
+
 ## Assumptions
 
 - Target users are students and people in financial hardship in Vietnam first; English serves
@@ -374,6 +586,8 @@ and confirm Pro features unlock on all signed-in devices; restore purchase works
   milestone; v1 core ships first.
 - Free users keep the existing option of using their own AI key; the MYX cloud assistant is a Pro
   feature with a monthly usage limit.
-- Bank-notification auto-import and shared group funds are out of scope for v1 (candidates for v2).
+- Receipt scan, voice entry, Android bank-notification import, group split with VietQR and
+  micro-lessons are v2: Expo has no official module for text recognition, speech-to-text or reading
+  other apps' notifications, so each needs a library review before it is planned.
 - The existing app's parser, offline assistant, insights and screens are reused and extended rather
   than rewritten.
