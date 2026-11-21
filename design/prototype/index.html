@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bản mẫu MYX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday money tool, calm and encouraging, shown as a shipped phone app
+   IDEA a pocket wallet that answers one question: how much can I spend today
+   PICTURE the working phone itself; on Home a large ring of today's allowance
+   COLOUR app themes drive everything (leaf green + mustard by default); page ground follows the active theme
+   TYPE Be Vietnam Pro (already in the codebase) for display and text
+   LAYOUT laptop: short title and review checklist left, phone right; phone: title, then full-width app */
+:root{color-scheme:light dark;--pg:light-dark(#eef3ef,#0d1310);--pink:light-dark(#14201a,#e6eee9);--psub:light-dark(#4d5d55,#9fb0a7)}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:var(--pg);color:var(--pink);font:16px/1.55 "Be Vietnam Pro",system-ui,sans-serif;overflow-x:clip}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--acc,#f2b705);outline-offset:2px}
+.wrap{max-width:1100px;margin:0 auto;padding:clamp(20px,4vw,48px) max(4vw,16px);display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:48px;align-items:start}
+.intro h1{font-size:clamp(32px,4vw,46px);line-height:1.05;letter-spacing:-.02em;margin:0 0 12px;text-wrap:balance}
+.intro p{color:var(--psub);margin:0 0 20px;max-width:46ch}
+.intro ol{padding-left:20px;margin:0 0 20px;color:var(--pink)}
+.intro li{margin-bottom:8px}
+.intro small{color:var(--psub);font-size:13px}
+.phone{--p:#12805c;--acc:#f2b705;position:relative;width:400px;height:820px;border-radius:52px;padding:12px;background:#111;box-shadow:0 2px 0 #333 inset,0 30px 60px -30px rgba(0,0,0,.5)}
+.app{--bg:color-mix(in srgb,var(--p) 6%,#fff);--surf:#fff;--ink:#13181a;--sub:#5b6468;--line:color-mix(in srgb,var(--p) 12%,#e4e7e6);--soft:color-mix(in srgb,var(--p) 12%,#fff);position:relative;height:100%;border-radius:40px;overflow:hidden;background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
+.app.dark{--bg:color-mix(in srgb,var(--p) 10%,#0b0d0e);--surf:color-mix(in srgb,var(--p) 8%,#16191b);--ink:#eef2f1;--sub:#9aa5a8;--line:color-mix(in srgb,var(--p) 18%,#2a2f31);--soft:color-mix(in srgb,var(--p) 25%,#16191b)}
+.status{display:flex;justify-content:space-between;align-items:center;padding:14px 28px 6px;font-size:14px;font-weight:600}
+.status svg{display:block}
+.scr{flex:1;overflow-y:auto;padding:6px 18px 24px;scrollbar-width:none}
+.scr::-webkit-scrollbar{display:none}
+.hd{display:flex;justify-content:space-between;align-items:center;margin:6px 0 14px}
+.hd h2{font-size:26px;line-height:1.1;margin:0;letter-spacing:-.02em}
+.hd .sm{font-size:13px;color:var(--sub)}
+.card{background:var(--surf);border:1px solid var(--line);border-radius:22px;padding:16px;margin-bottom:12px}
+.hero{background:var(--p);color:#fff;border:0;display:grid;grid-template-columns:116px minmax(0,1fr);gap:14px;align-items:center}
+.hero .lbl{font-size:13px;opacity:.85}
+.hero .big{font-size:clamp(26px,8vw,32px);font-weight:800;letter-spacing:-.02em;line-height:1.1;white-space:nowrap}
+.hero .note{font-size:13px;opacity:.9;margin-top:6px}
+.ring{width:116px;height:116px}
+.minis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.mini{background:var(--surf);border:1px solid var(--line);border-radius:18px;padding:10px 8px}
+.mini b{display:block;font-size:14px;letter-spacing:-.01em;white-space:nowrap}
+.mini span{font-size:13px;color:var(--sub);line-height:1.3;display:block}
+.quick{display:flex;gap:8px;align-items:center;width:100%;text-align:left;background:var(--surf);border:1px solid var(--line);border-radius:999px;padding:6px 6px 6px 16px;margin-bottom:16px;color:var(--sub);font-size:15px;min-height:48px}
+.quick i{margin-left:auto;background:var(--p);color:#fff;border-radius:999px;width:36px;height:36px;display:grid;place-items:center;font-style:normal;font-size:22px}
+h3{font-size:15px;margin:16px 0 8px}
+.chd{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.chd .seg{margin:0;padding:3px}
+.chd .seg button{min-height:32px;padding:4px 10px;font-size:13px}
+.tot{font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1.1;white-space:nowrap}
+.cmp{font-size:13px;color:var(--sub)}
+.bars{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:6px;align-items:end;height:150px;margin-top:12px}
+.bars>div{display:grid;grid-template-rows:auto 1fr auto;height:100%;text-align:center}
+.bars small{font-size:13px;color:var(--sub);white-space:nowrap}
+.bars .v{font-size:13px;font-weight:600;white-space:nowrap;align-self:end}
+.bars .col{display:flex;align-items:flex-end;justify-content:center}
+.bars .col i{display:block;width:70%;max-width:30px;border-radius:8px 8px 3px 3px;background:color-mix(in srgb,var(--p) 55%,var(--surf))}
+.bars .col i.hi{background:var(--p)}
+.bars .col i.fut{background:none;border:2px dashed var(--line);height:20%}
+.line{position:relative;height:150px;margin-top:6px}
+.line svg{position:absolute;inset:0;width:100%;height:100%}
+.legend{display:flex;gap:14px;font-size:13px;color:var(--sub);margin-top:6px;flex-wrap:wrap}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;background:var(--p);vertical-align:middle;margin-right:5px}
+.legend i.d{background:none;border-top:2px dashed var(--acc);height:0}
+.back{border:0;background:var(--soft);border-radius:12px;width:40px;height:40px;font-size:22px;line-height:1}
+.av{border:0;padding:0;background:none}
+.row{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.ic{flex:none;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-weight:700;font-size:15px;color:#fff}
+.grow{flex:1}
+.ic svg{width:62%;height:62%}
+.gi .f{fill:#fff;opacity:.38}
+.gi .s{fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.gi .w{fill:#fff}
+.gi .b{fill:none;stroke:var(--c);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.grow b{display:block;font-size:15px;font-weight:600}
+.grow span{font-size:13px;color:var(--sub)}
+.amt{font-weight:700;white-space:nowrap;font-size:15px}
+.amt.in{color:var(--p)}
+.bar{height:8px;border-radius:9px;background:var(--line);overflow:hidden;margin-top:6px}
+.bar>i{display:block;height:100%;border-radius:9px;background:var(--p)}
+.bar>i.warn{background:var(--acc)}
+.bar>i.over{background:#d6453d}
+.tag{font-size:13px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.tag.warn{background:color-mix(in srgb,var(--acc) 25%,transparent)}
+.tag.over{background:#d6453d22;color:#d6453d}
+.seg{display:flex;background:var(--soft);border-radius:14px;padding:4px;margin-bottom:14px}
+.seg button{flex:1;border:0;background:none;border-radius:10px;padding:9px 4px;font-size:14px;font-weight:600;color:var(--sub);min-height:40px}
+.seg button.on{background:var(--surf);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.btn{border:0;background:var(--p);color:#fff;border-radius:14px;padding:12px 16px;font-weight:700;min-height:46px;width:100%}
+.btn.ghost{background:var(--soft);color:var(--ink)}
+.btn.sm{width:auto;min-height:36px;padding:6px 12px;font-size:13px;border-radius:10px}
+.btn.danger{background:#d6453d}
+.streak{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:4px;margin:12px 0}
+.streak i{aspect-ratio:1;border-radius:5px;background:var(--line)}
+.streak i.on{background:var(--p)}
+.streak i.today{outline:2px solid var(--acc)}
+.chat{display:flex;flex-direction:column;gap:8px}
+.msg{max-width:85%;padding:10px 14px;border-radius:18px;font-size:15px;line-height:1.45}
+.msg.u{align-self:flex-end;background:var(--p);color:#fff;border-bottom-right-radius:6px}
+.msg.a{align-self:flex-start;background:var(--surf);border:1px solid var(--line);border-bottom-left-radius:6px}
+.act{border:2px solid var(--p);border-radius:16px;padding:12px;margin-top:8px;background:var(--soft)}
+.act .t{font-size:13px;color:var(--sub)}
+.act .two{display:flex;gap:8px;margin-top:10px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.chip{border:1px solid var(--line);background:var(--surf);border-radius:99px;padding:6px 12px;font-size:13px;min-height:34px}
+.composer{display:flex;gap:8px;padding:10px 14px 4px;border-top:1px solid var(--line);background:var(--bg)}
+.composer input{flex:1;border:1px solid var(--line);background:var(--surf);border-radius:99px;padding:10px 16px;font-size:16px;min-height:44px}
+.mode{font-size:13px;color:var(--sub);display:flex;align-items:center;gap:6px}
+.mode i{width:8px;height:8px;border-radius:9px;background:var(--acc)}
+.themes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.th{border:2px solid var(--line);border-radius:16px;padding:8px;background:var(--surf);text-align:left;position:relative}
+.th.on{border-color:var(--ink)}
+.th .sw{height:44px;border-radius:10px;display:flex;align-items:flex-end;padding:6px;gap:4px}
+.th .sw i{width:14px;height:14px;border-radius:5px;background:#fff}
+.th span{display:block;font-size:13px;font-weight:600;margin-top:6px}
+.th em{position:absolute;top:12px;right:12px;font-style:normal;font-size:13px;font-weight:700;background:#000c;color:#fff;border-radius:6px;padding:0 6px}
+.set{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-top:1px solid var(--line);font-size:15px;width:100%;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;min-height:48px}
+.set:first-child{border-top:0}
+.set .v{color:var(--sub);font-size:14px}
+.tabbar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;margin:6px 8px 14px;padding:5px 4px;border-radius:30px;background:color-mix(in srgb,var(--surf) 88%,transparent);border:1px solid var(--line);box-shadow:0 10px 28px -12px rgba(0,0,0,.35);backdrop-filter:blur(14px)}
+.tabbar button{border:0;background:none;display:grid;justify-items:center;gap:1px;font-size:13px;letter-spacing:-.02em;white-space:nowrap;color:var(--sub);padding:6px 0;min-height:52px;border-radius:24px}
+.tabbar button.on{color:var(--p);font-weight:700;background:var(--soft)}
+.tabbar svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tabbar .plus span{width:50px;height:50px;border-radius:50%;background:var(--p);color:#fff;display:grid;place-items:center;box-shadow:0 6px 14px -6px var(--p)}
+.sheet{position:absolute;inset:0;background:#0007;display:none;align-items:flex-end;z-index:5}
+.sheet.open{display:flex}
+.panel{background:var(--bg);width:100%;max-height:88%;overflow-y:auto;border-radius:28px 28px 0 0;padding:10px 18px 26px;animation:up .25s ease-out}
+.panel .grab{width:40px;height:5px;border-radius:5px;background:var(--line);margin:0 auto 12px}
+.panel h2{margin:0 0 6px;font-size:22px}
+.panel textarea{width:100%;border:1px solid var(--line);background:var(--surf);border-radius:16px;padding:12px;font-size:16px;min-height:84px;resize:none}
+.rev{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);background:var(--surf);border-radius:14px;margin-top:8px}
+.rev select{border:1px solid var(--line);background:var(--soft);border-radius:8px;padding:4px;font-size:14px;color:var(--ink)}
+.toast{position:absolute;left:50%;bottom:150px;transform:translateX(-50%);background:var(--ink);color:var(--bg);border-radius:99px;padding:8px 16px;font-size:14px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;z-index:6}
+.toast.show{opacity:1}
+@keyframes up{from{transform:translateY(40px);opacity:.4}}
+@media(prefers-reduced-motion:reduce){.panel{animation:none}.toast{transition:none}}
+@media(max-width:880px){.wrap{grid-template-columns:minmax(0,1fr);gap:24px}.phone{margin:0 auto}}
+@media(max-width:460px){.wrap{padding-inline:0}.intro{padding:0 16px}.phone{width:100%;height:min(820px,calc(100svh - 24px));border-radius:0;padding:0;background:none;box-shadow:none}.app{border-radius:24px 24px 0 0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="intro">
+    <h1>Bản mẫu MYX</h1>
+    <p>Bấm thử như app thật: nhập chi tiêu bằng câu, trả hóa đơn, hỏi Trợ lý, đổi theme và ngôn ngữ. Mọi con số tự tính lại theo công thức trong plan.</p>
+    <ol>
+      <li>Trang chủ có đủ rõ con số "hôm nay còn tiêu được" chưa?</li>
+      <li>Nút + : gõ "trưa bún bò 50k, xăng 80k" rồi Lưu.</li>
+      <li>Ngân sách có 3 mục: ngân sách, mục tiêu, hóa đơn và nợ.</li>
+      <li>Trợ lý: thử "đặt ngân sách ăn uống 2 triệu" rồi Xác nhận.</li>
+      <li>Cài đặt: đổi theme, sáng/tối, Tiếng Việt / English.</li>
+    </ol>
+    <small>Dữ liệu là mẫu của một sinh viên giả định, ngày 21/11/2026. AI trong bản mẫu là trả lời soạn sẵn.</small>
+  </section>
+  <div class="phone"><div class="app" id="app">
+    <div class="status"><span>9:41</span><svg width="64" height="12" viewBox="0 0 64 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/><path d="M30 3.5a9 9 0 0 1 12 0l-1.4 1.5a7 7 0 0 0-9.2 0zM32.6 6.3a5 5 0 0 1 6.8 0L36 10z"/><rect x="46" y="1" width="16" height="10" rx="3" fill="none" stroke="currentColor"/><rect x="48" y="3" width="10" height="6" rx="1.5"/></svg></div>
+    <div class="scr" id="scr"></div>
+    <div id="composer"></div>
+    <nav class="tabbar" id="tabs"></nav>
+    <div class="sheet" id="sheet"><div class="panel" id="panel"></div></div>
+    <div class="toast" id="toast"></div>
+  </div></div>
+</div>
+<script>
+{
+const L={vi:{home:'Trang chủ',budget:'Ngân sách',add:'Thêm',ai:'Trợ lý',settings:'Cài đặt',billsTab:'Hóa đơn',subsH:'Gói đăng ký',subsTot:'{a} mỗi tháng',renew:'gia hạn {d}',billsH:'Hóa đơn & nợ',mustPay:'Cần trả trước kỳ nhận tiền 1/12',spend:'Chi tiêu',wk:'Tuần',mo:'Tháng',wkTot:'Tuần này (16–22/11)',moTot:'Tháng 11 đến hôm nay',vsWk:'Tuần trước {a}',vsMo:'Trung bình 5 tháng trước {a}',trend:'Chi mỗi ngày',spentDay:'Đã chi',safeLine:'Mức an toàn {a}/ngày',days:['T2','T3','T4','T5','T6','T7','CN'],mons:['T6','T7','T8','T9','T10','T11'],hi:'Chào Tyson',today:'Thứ Bảy, 21/11',leftToday:'Hôm nay còn tiêu được',perDay:'Mỗi ngày {d} · còn {n} ngày tới kỳ nhận tiền 1/12',short:'Thiếu {s} đến kỳ nhận tiền. Thử giảm ăn ngoài vài ngày nhé.',balance:'Số dư',reserved:'Giữ cho hóa đơn',fund:'Quỹ khẩn cấp',quick:'Hôm nay bạn đã tiêu gì?',due:'Sắp đến hạn',recent:'Gần đây',tip:'Gợi ý của MYX',tipText:'Cà phê đã dùng {p}% hạn mức. Pha ở nhà 3 hôm tuần này là tiết kiệm khoảng 75.000đ.',inDays:'còn {n} ngày',segB:'Ngân sách',segG:'Mục tiêu',segD:'Hóa đơn & nợ',month:'Tháng 11',spentOf:'Đã chi {a} / {b}',near:'Sắp chạm',over:'Vượt',left:'còn {a}',ef:'Quỹ khẩn cấp',efSub:'Mỗi ngày 10.000đ · chuỗi {n} ngày',saveToday:'Hôm nay để dành 10.000đ',saved:'Đã để dành hôm nay',goals:'Mục tiêu khác',bills:'Hóa đơn định kỳ',debts:'Nợ & trả góp',pay:'Đã trả',paid:'Đã trả ✓',got:'Đã nhận',inst:'Kỳ {a}/{b} · còn {c}',owedMe:'{n} nợ bạn',addT:'Thêm giao dịch',addSub:'Gõ như nhắn tin, MYX tự tách từng khoản.',parse:'Phân tích',saveAll:'Lưu {n} giao dịch',none:'Chưa hiểu câu này, thử thêm số tiền như "50k".',aiMode:'Offline · miễn phí',aiHello:'Chào bạn, mình là trợ lý của MYX. Mình xem được chi tiêu của bạn và có thể giúp ghi chép, đặt ngân sách. Mọi thay đổi đều cần bạn xác nhận.',ask:'Hỏi về tiền của bạn...',confirm:'Xác nhận',reject:'Bỏ qua',done:'Đã cập nhật ✓',dismissed:'Đã bỏ qua',lang:'Ngôn ngữ',look:'Giao diện',light:'Sáng',dark:'Tối',sys:'Hệ thống',theme:'Theme',account:'Tài khoản',sync:'Đồng bộ',synced:'Đã đồng bộ · vừa xong',export:'Xuất dữ liệu (CSV)',del:'Xóa tài khoản',pro:'MYX Pro',proSub:'Trợ lý AI cloud, thêm theme, báo cáo nâng cao',proNote:'Tính năng cốt lõi luôn miễn phí.',proBtn:'Dùng thử Pro (bản mẫu)',delQ:'Xóa vĩnh viễn tài khoản?',delSub:'Toàn bộ dữ liệu trên cloud sẽ bị xóa và bạn sẽ đăng xuất. Không thể hoàn tác.',cancel:'Hủy',delYes:'Xóa vĩnh viễn',toastDel:'Bản mẫu: không có gì bị xóa',toastExp:'Bản mẫu: file CSV sẽ được tạo ở app thật',toastSaved:'Đã lưu {n} giao dịch',sugg:['Tháng này tiêu cà phê bao nhiêu?','Đặt ngân sách ăn uống 2 triệu','Mình nên tiết kiệm ở đâu?','Còn bao nhiêu đến kỳ nhận tiền?'],samples:['trưa bún bò 50k, xăng 80k','cà phê 35k và bánh mì 20k','mẹ cho 1tr5']},
+en:{home:'Home',budget:'Budget',add:'Add',ai:'Assistant',settings:'Settings',billsTab:'Bills',subsH:'Subscriptions',subsTot:'{a} per month',renew:'renews {d}',billsH:'Bills & debts',mustPay:'Due before payday on Dec 1',spend:'Spending',wk:'Week',mo:'Month',wkTot:'This week (Nov 16–22)',moTot:'November so far',vsWk:'Last week {a}',vsMo:'Previous 5-month average {a}',trend:'Daily spending',spentDay:'Spent',safeLine:'Safe level {a}/day',days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],mons:['Jun','Jul','Aug','Sep','Oct','Nov'],hi:'Hi Tyson',today:'Saturday, Nov 21',leftToday:'Left to spend today',perDay:'{d} per day · {n} days until payday Dec 1',short:'{s} short until payday. Try cooking at home for a few days.',balance:'Balance',reserved:'Held for bills',fund:'Emergency fund',quick:'What did you spend today?',due:'Coming up',recent:'Recent',tip:'MYX tip',tipText:'Coffee has used {p}% of its limit. Brewing at home 3 days this week saves about 75,000₫.',inDays:'in {n} days',segB:'Budget',segG:'Goals',segD:'Bills & debts',month:'November',spentOf:'Spent {a} of {b}',near:'Close',over:'Over',left:'{a} left',ef:'Emergency fund',efSub:'10,000₫ a day · {n}-day streak',saveToday:'Save 10,000₫ today',saved:'Saved today',goals:'Other goals',bills:'Recurring bills',debts:'Debts & installments',pay:'Mark paid',paid:'Paid ✓',got:'Received',inst:'Payment {a}/{b} · {c} left',owedMe:'{n} owes you',addT:'Add transactions',addSub:'Type like a text message; MYX splits each item.',parse:'Read it',saveAll:'Save {n} transactions',none:'Could not read that, try adding an amount like "50k".',aiMode:'Offline · free',aiHello:'Hi, I am the MYX assistant. I can see your spending and help you log it or set budgets. Every change needs your confirmation.',ask:'Ask about your money...',confirm:'Confirm',reject:'Dismiss',done:'Updated ✓',dismissed:'Dismissed',lang:'Language',look:'Appearance',light:'Light',dark:'Dark',sys:'System',theme:'Theme',account:'Account',sync:'Sync',synced:'Synced · just now',export:'Export data (CSV)',del:'Delete account',pro:'MYX Pro',proSub:'Cloud AI assistant, more themes, advanced reports',proNote:'Core features are always free.',proBtn:'Try Pro (prototype)',delQ:'Permanently delete account?',delSub:'All your cloud data will be erased and you will be signed out. This cannot be undone.',cancel:'Cancel',delYes:'Delete forever',toastDel:'Prototype: nothing was deleted',toastExp:'Prototype: the real app creates a CSV file',toastSaved:'Saved {n} transactions',sugg:['How much did I spend on coffee this month?','Set my food budget to 2 million','Where should I save?','How much until payday?'],samples:['lunch 50k, bus 7k','coffee 35k and bread 20k','salary 4m']}};
+const ICO={"rice": "<path class=\"f\" d=\"M4 11h16a8 8 0 0 1-16 0z\"/><path class=\"s\" d=\"M4 11h16a8 8 0 0 1-16 0zM9 20h6M7.5 11a4.5 3 0 0 1 9 0M14 3l-3 7M18 4l-4 6\"/>", "noodle": "<path class=\"f\" d=\"M3 12h18a9 7 0 0 1-18 0z\"/><path class=\"s\" d=\"M3 12h18a9 7 0 0 1-18 0zM9 20h6M8 9c0-1.5 1.5-1.5 1.5-3S8 4.5 8 3M12 9c0-1.5 1.5-1.5 1.5-3S12 4.5 12 3M16 9c0-1.5 1.5-1.5 1.5-3S16 4.5 16 3\"/>", "banhmi": "<path class=\"f\" d=\"M5 18c-2-2 0-6 4-10s8-6 10-4 0 6-4 10-8 6-10 4z\"/><path class=\"s\" d=\"M5 18c-2-2 0-6 4-10s8-6 10-4 0 6-4 10-8 6-10 4zM9 11l2 2M12 8l2 2M6.5 14l2 2\"/>", "coffee": "<path class=\"f\" d=\"M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z\"/><path class=\"s\" d=\"M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M4 21.5h14M8.5 3c0 1.5 1 1.5 1 3M12.5 3c0 1.5 1 1.5 1 3\"/>", "milktea": "<path class=\"f\" d=\"M6 9h12l-1.5 11a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1z\"/><path class=\"s\" d=\"M6 9h12l-1.5 11a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1zM5 9h14M13 9l2-6.5 3 .8\"/><circle class=\"w\" cx=\"10\" cy=\"17.5\" r=\"1.1\"/><circle class=\"w\" cx=\"13.4\" cy=\"18.2\" r=\"1.1\"/><circle class=\"w\" cx=\"12\" cy=\"15\" r=\"1.1\"/>", "soda": "<rect class=\"f\" x=\"7\" y=\"4\" width=\"10\" height=\"17\" rx=\"2.5\"/><rect class=\"s\" x=\"7\" y=\"4\" width=\"10\" height=\"17\" rx=\"2.5\"/><path class=\"s\" d=\"M10 2.2h4M7 9h10M7 16h10\"/>", "candy": "<circle class=\"f\" cx=\"12\" cy=\"12\" r=\"4.5\"/><circle class=\"s\" cx=\"12\" cy=\"12\" r=\"4.5\"/><path class=\"s\" d=\"M7.8 10.3L3 8v8l4.8-2.3M16.2 10.3L21 8v8l-4.8-2.3M10.5 10.5l3 3\"/>", "icecream": "<path class=\"f\" d=\"M7 10a5 5 0 0 1 10 0z\"/><path class=\"s\" d=\"M7 10h10l-5 11zM7 10a5 5 0 0 1 10 0M9.5 13l4 3M14.5 13l-3.2 4.2\"/>", "fruit": "<path class=\"f\" d=\"M12 8c-2-1.5-6-1-6 4 0 4 3 9 6 7.5 3 1.5 6-3.5 6-7.5 0-5-4-5.5-6-4z\"/><path class=\"s\" d=\"M12 8c-2-1.5-6-1-6 4 0 4 3 9 6 7.5 3 1.5 6-3.5 6-7.5 0-5-4-5.5-6-4zM12 8V4M12 5c1-2 3-2.2 4-1.5-1 1.5-3 2-4 1.5\"/>", "market": "<path class=\"f\" d=\"M3 10h18l-2 9a2 2 0 0 1-2 1.6H7A2 2 0 0 1 5 19z\"/><path class=\"s\" d=\"M3 10h18l-2 9a2 2 0 0 1-2 1.6H7A2 2 0 0 1 5 19zM8 10l3-6M16 10l-3-6M9 14v3M12 14v3M15 14v3\"/>", "beer": "<path class=\"f\" d=\"M5 8h10v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z\"/><path class=\"s\" d=\"M5 8h10v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2zM15 10h2a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-2M5 8a2.5 2.5 0 0 1 2-4 3 3 0 0 1 5 0 2.5 2.5 0 0 1 3 4M8.5 12v5M11.5 12v5\"/>", "fuel": "<rect class=\"f\" x=\"4\" y=\"3\" width=\"10\" height=\"18\" rx=\"2\"/><path class=\"s\" d=\"M6 3h6a2 2 0 0 1 2 2v16H4V5a2 2 0 0 1 2-2zM3 21h12M7 7h4v4H7zM14 9h2a2 2 0 0 1 2 2v5a1.5 1.5 0 0 0 3 0V9l-3-3\"/>", "bike": "<circle class=\"f\" cx=\"6\" cy=\"16\" r=\"3.5\"/><circle class=\"f\" cx=\"18\" cy=\"16\" r=\"3.5\"/><circle class=\"s\" cx=\"6\" cy=\"16\" r=\"3.5\"/><circle class=\"s\" cx=\"18\" cy=\"16\" r=\"3.5\"/><path class=\"s\" d=\"M6 16h5l3-6h-4M14 10l4 6M15 6h3l-1 4\"/>", "bus": "<rect class=\"f\" x=\"4\" y=\"3\" width=\"16\" height=\"15\" rx=\"3\"/><rect class=\"s\" x=\"4\" y=\"3\" width=\"16\" height=\"15\" rx=\"3\"/><path class=\"s\" d=\"M4 11h16M8 21v-3M16 21v-3M8 14.5h.01M16 14.5h.01M8 6.5h8\"/>", "car": "<path class=\"f\" d=\"M3 13l2-5a2 2 0 0 1 2-1.5h10A2 2 0 0 1 19 8l2 5v4H3z\"/><path class=\"s\" d=\"M3 13l2-5a2 2 0 0 1 2-1.5h10A2 2 0 0 1 19 8l2 5v4H3zM3 13h18M10 6.5V4h4v2.5M6 17v2.5M18 17v2.5M7 15h.01M17 15h.01\"/>", "parking": "<rect class=\"f\" x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"4\"/><rect class=\"s\" x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"4\"/><path class=\"s\" d=\"M10 16V8h3a2.5 2.5 0 0 1 0 5h-3\"/>", "ticket": "<path class=\"f\" d=\"M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z\"/><path class=\"s\" d=\"M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4zM15 6v2M15 11v2M15 16v2M7 10h4M7 14h3\"/>", "repair": "<path class=\"f\" d=\"M14.5 3.5a5 5 0 0 0-5.2 6.8L3.5 16.1a2.1 2.1 0 0 0 3 3l5.8-5.8a5 5 0 0 0 6.8-5.2l-3 3-3-.8-.8-3z\"/><path class=\"s\" d=\"M14.5 3.5a5 5 0 0 0-5.2 6.8L3.5 16.1a2.1 2.1 0 0 0 3 3l5.8-5.8a5 5 0 0 0 6.8-5.2l-3 3-3-.8-.8-3z\"/>", "rent": "<path class=\"f\" d=\"M5 10.5l7-6.2 7 6.2V20H5z\"/><path class=\"s\" d=\"M3 12l9-8 9 8M5 10.5V20h14v-9.5M10 20v-5h4v5\"/>", "power": "<path class=\"f\" d=\"M13 2L5 13h6l-1 9 8-11h-6z\"/><path class=\"s\" d=\"M13 2L5 13h6l-1 9 8-11h-6z\"/>", "water": "<path class=\"f\" d=\"M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z\"/><path class=\"s\" d=\"M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11zM9 14a3 3 0 0 0 3 3\"/>", "wifi": "<path class=\"f\" d=\"M3 9a13 13 0 0 1 18 0l-9 9z\"/><circle class=\"w\" cx=\"12\" cy=\"18.5\" r=\"1.6\"/><path class=\"s\" d=\"M3 9a13 13 0 0 1 18 0M6 12.5a8.5 8.5 0 0 1 12 0M9 15.8a4 4 0 0 1 6 0\"/>", "topup": "<rect class=\"f\" x=\"6\" y=\"2.5\" width=\"12\" height=\"19\" rx=\"2.5\"/><rect class=\"s\" x=\"6\" y=\"2.5\" width=\"12\" height=\"19\" rx=\"2.5\"/><path class=\"s\" d=\"M10.5 18.5h3M12.8 6.5l-2.3 4h3l-2.3 4\"/>", "gas": "<path class=\"f\" d=\"M12 21a6 6 0 0 0 6-6c0-4-3-6-4-10-2 2-3 4-3 6-1-1-1.5-2-1.5-3C7 10 6 12.5 6 15a6 6 0 0 0 6 6z\"/><path class=\"s\" d=\"M12 21a6 6 0 0 0 6-6c0-4-3-6-4-10-2 2-3 4-3 6-1-1-1.5-2-1.5-3C7 10 6 12.5 6 15a6 6 0 0 0 6 6zM12 21a2.5 2.5 0 0 1-2.5-2.5c0-1.5 2.5-4 2.5-4s2.5 2.5 2.5 4A2.5 2.5 0 0 1 12 21z\"/>", "tuition": "<path class=\"f\" d=\"M2 9l10-5 10 5-10 5z\"/><path class=\"s\" d=\"M2 9l10-5 10 5-10 5zM6 11v5c3 2.5 9 2.5 12 0v-5M22 9v5\"/>", "book": "<path class=\"f\" d=\"M3 5c3-1 6-1 9 1v14c-3-2-6-2-9-1z\"/><path class=\"s\" d=\"M3 5c3-1 6-1 9 1 3-2 6-2 9-1v14c-3-1-6-1-9 1-3-2-6-2-9-1zM12 6v14\"/>", "print": "<rect class=\"f\" x=\"3\" y=\"8\" width=\"18\" height=\"9\" rx=\"2\"/><path class=\"s\" d=\"M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M7 14h10v7H7zM17.5 11h.01\"/>", "course": "<rect class=\"f\" x=\"4\" y=\"4\" width=\"16\" height=\"11\" rx=\"1.5\"/><rect class=\"s\" x=\"4\" y=\"4\" width=\"16\" height=\"11\" rx=\"1.5\"/><path class=\"s\" d=\"M2 19h20M10.5 7.5l4 2-4 2z\"/>", "music": "<circle class=\"f\" cx=\"7\" cy=\"17\" r=\"3\"/><circle class=\"f\" cx=\"17\" cy=\"15\" r=\"3\"/><path class=\"s\" d=\"M10 17V5l10-2v12M10 9l10-2\"/><circle class=\"s\" cx=\"7\" cy=\"17\" r=\"3\"/><circle class=\"s\" cx=\"17\" cy=\"15\" r=\"3\"/>", "movie": "<rect class=\"f\" x=\"3\" y=\"9\" width=\"18\" height=\"12\" rx=\"2\"/><rect class=\"s\" x=\"3\" y=\"9\" width=\"18\" height=\"12\" rx=\"2\"/><path class=\"s\" d=\"M3 9l16.5-5 1 3.2M7.5 7.6l2.4 2.2M12.5 6.1l2.4 2.2M10.5 12.5l4.5 2.5-4.5 2.5z\"/>", "game": "<path class=\"f\" d=\"M7 7h10a5 5 0 0 1 4.6 7l-1 2.3a2.5 2.5 0 0 1-4.3.5L14.5 15h-5l-1.8 1.8a2.5 2.5 0 0 1-4.3-.5l-1-2.3A5 5 0 0 1 7 7z\"/><path class=\"s\" d=\"M7 7h10a5 5 0 0 1 4.6 7l-1 2.3a2.5 2.5 0 0 1-4.3.5L14.5 15h-5l-1.8 1.8a2.5 2.5 0 0 1-4.3-.5l-1-2.3A5 5 0 0 1 7 7zM7.5 10v3M6 11.5h3M15.5 10.5h.01M17.5 12.5h.01\"/>", "concert": "<rect class=\"f\" x=\"9\" y=\"2.5\" width=\"6\" height=\"11\" rx=\"3\"/><rect class=\"s\" x=\"9\" y=\"2.5\" width=\"6\" height=\"11\" rx=\"3\"/><path class=\"s\" d=\"M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7\"/>", "travel": "<rect class=\"f\" x=\"3\" y=\"7\" width=\"18\" height=\"13\" rx=\"2.5\"/><rect class=\"s\" x=\"3\" y=\"7\" width=\"18\" height=\"13\" rx=\"2.5\"/><path class=\"s\" d=\"M9 7V5a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 5v2M8 7v13M16 7v13\"/>", "photo": "<path class=\"f\" d=\"M3 8a2 2 0 0 1 2-2h2.5l1.5-2h6l1.5 2H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/><path class=\"s\" d=\"M3 8a2 2 0 0 1 2-2h2.5l1.5-2h6l1.5 2H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/><circle class=\"s\" cx=\"12\" cy=\"13\" r=\"3.5\"/>", "badminton": "<path class=\"f\" d=\"M7.5 3h9l-2.6 12h-3.8z\"/><path class=\"s\" d=\"M7.5 3h9l-2.6 12h-3.8zM10.6 3l.5 12M13.4 3l-.5 12M8.3 7.5h7.4\"/><path class=\"w\" d=\"M10 15h4v2a2 2 0 0 1-4 0z\"/>", "volleyball": "<circle class=\"f\" cx=\"12\" cy=\"12\" r=\"9\"/><circle class=\"s\" cx=\"12\" cy=\"12\" r=\"9\"/><path class=\"s\" d=\"M12 3c-1.5 4-.5 7.5 2.5 10M21 12.5c-4-1.8-7.5-1.2-9.5 1.5M5 18.5c3.2-.8 5.6-2.6 6.5-4.5M11.5 14C8 13 5.5 10.6 4.2 7.5\"/>", "football": "<circle class=\"f\" cx=\"12\" cy=\"12\" r=\"9\"/><path class=\"w\" d=\"M12 8l3.3 2.4-1.3 3.9h-4l-1.3-3.9z\"/><circle class=\"s\" cx=\"12\" cy=\"12\" r=\"9\"/><path class=\"s\" d=\"M12 8V3.5M15.3 10.4l4.3-1.5M14 14.3l2.7 3.7M10 14.3L7.3 18M8.7 10.4L4.4 8.9\"/>", "gym": "<rect class=\"f\" x=\"3\" y=\"7.5\" width=\"4\" height=\"9\" rx=\"1\"/><rect class=\"f\" x=\"17\" y=\"7.5\" width=\"4\" height=\"9\" rx=\"1\"/><rect class=\"s\" x=\"3\" y=\"7.5\" width=\"4\" height=\"9\" rx=\"1\"/><rect class=\"s\" x=\"17\" y=\"7.5\" width=\"4\" height=\"9\" rx=\"1\"/><path class=\"s\" d=\"M7 12h10M1.6 10.5v3M22.4 10.5v3\"/>", "swim": "<path class=\"f\" d=\"M3 16c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0 3-1 4.5 0V20H3z\"/><circle class=\"w\" cx=\"16.5\" cy=\"6.5\" r=\"2\"/><path class=\"s\" d=\"M4 12l5-3.5 3.2 3.2 2.3-1.2M3 16c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0 3-1 4.5 0M3 20c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0 3-1 4.5 0\"/>", "run": "<path class=\"f\" d=\"M3 17V9.5l4-1 2 2.5 3-1 3 3 5 1a2 2 0 0 1 2 2V17z\"/><path class=\"s\" d=\"M3 17V9.5l4-1 2 2.5 3-1 3 3 5 1a2 2 0 0 1 2 2V17zM3 17v2.5h18V17M10 13.5l1-1M12.5 15l1-1\"/>", "clothes": "<path class=\"f\" d=\"M8 3L3 6l2 4 2-1v12h10V9l2 1 2-4-5-3a4 4 0 0 1-8 0z\"/><path class=\"s\" d=\"M8 3L3 6l2 4 2-1v12h10V9l2 1 2-4-5-3a4 4 0 0 1-8 0z\"/>", "cosmetic": "<path class=\"f\" d=\"M8 11h8v10H8z\"/><path class=\"s\" d=\"M8 11h8v10H8zM9.5 11V7l5-3v7M8 15h8\"/>", "beauty": "<circle class=\"f\" cx=\"6\" cy=\"18\" r=\"3\"/><circle class=\"f\" cx=\"18\" cy=\"18\" r=\"3\"/><circle class=\"s\" cx=\"6\" cy=\"18\" r=\"3\"/><circle class=\"s\" cx=\"18\" cy=\"18\" r=\"3\"/><path class=\"s\" d=\"M8 15.8L17 3M16 15.8L7 3\"/>", "gadget": "<rect class=\"f\" x=\"3\" y=\"14\" width=\"5\" height=\"7\" rx=\"2\"/><rect class=\"f\" x=\"16\" y=\"14\" width=\"5\" height=\"7\" rx=\"2\"/><path class=\"s\" d=\"M4 15v-3a8 8 0 0 1 16 0v3\"/><rect class=\"s\" x=\"3\" y=\"14\" width=\"5\" height=\"7\" rx=\"2\"/><rect class=\"s\" x=\"16\" y=\"14\" width=\"5\" height=\"7\" rx=\"2\"/>", "parcel": "<path class=\"f\" d=\"M3 7.5L12 3l9 4.5v9L12 21l-9-4.5z\"/><path class=\"s\" d=\"M3 7.5L12 3l9 4.5v9L12 21l-9-4.5zM3 7.5l9 4.5 9-4.5M12 12v9M7.5 5.2l9 4.5\"/>", "medicine": "<path class=\"f\" d=\"M4.5 13.5l9-9a4.2 4.2 0 0 1 6 6l-9 9a4.2 4.2 0 0 1-6-6z\"/><path class=\"w\" d=\"M4.5 13.5L9 9l6 6-4.5 4.5a4.2 4.2 0 0 1-6-6z\"/><path class=\"s\" d=\"M4.5 13.5l9-9a4.2 4.2 0 0 1 6 6l-9 9a4.2 4.2 0 0 1-6-6zM9 9l6 6\"/>", "doctor": "<path class=\"f\" d=\"M12 20s-8-4.5-8-10.5A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 8 2.5C20 15.5 12 20 12 20z\"/><path class=\"s\" d=\"M12 20s-8-4.5-8-10.5A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 8 2.5C20 15.5 12 20 12 20zM6.5 12h3l1.5-3 2.5 6 1.5-3h2.5\"/>", "gift": "<rect class=\"f\" x=\"3\" y=\"9\" width=\"18\" height=\"12\" rx=\"1.5\"/><path class=\"s\" d=\"M3 9h18v4H3zM5 13v8h14v-8M12 9v12M12 9c-2-4-6-4-6-1.5S10 9 12 9c2 0 6-.5 6-1.5S14 5 12 9\"/>", "wedding": "<rect class=\"f\" x=\"3\" y=\"6\" width=\"18\" height=\"13\" rx=\"2\"/><rect class=\"s\" x=\"3\" y=\"6\" width=\"18\" height=\"13\" rx=\"2\"/><path class=\"s\" d=\"M3 8l9 6 9-6\"/><path class=\"w\" d=\"M12 18.4s-2.8-1.6-2.8-3.5a1.4 1.4 0 0 1 2.8-.4 1.4 1.4 0 0 1 2.8.4c0 1.9-2.8 3.5-2.8 3.5z\"/>", "charity": "<path class=\"f\" d=\"M12 11s-4-2.4-4-5a2 2 0 0 1 4-1 2 2 0 0 1 4 1c0 2.6-4 5-4 5z\"/><path class=\"s\" d=\"M12 11s-4-2.4-4-5a2 2 0 0 1 4-1 2 2 0 0 1 4 1c0 2.6-4 5-4 5zM3 14h3l3 1.5h4a1.5 1.5 0 0 1 0 3H9M6 20.5l3 .8 7.5-2 4-4a1.5 1.5 0 0 0-2-2.2l-4 3\"/>", "lend": "<circle class=\"f\" cx=\"12\" cy=\"12\" r=\"9\"/><circle class=\"s\" cx=\"12\" cy=\"12\" r=\"9\"/><path class=\"s\" d=\"M7 9.5h10l-3-3M17 14.5H7l3 3\"/>", "date": "<path class=\"f\" d=\"M10 20s-7-4-7-9a4 4 0 0 1 7-2.5A4 4 0 0 1 17 11c0 5-7 9-7 9z\"/><path class=\"s\" d=\"M10 20s-7-4-7-9a4 4 0 0 1 7-2.5A4 4 0 0 1 17 11c0 5-7 9-7 9zM15.5 7.2A3 3 0 0 1 21 9c0 1.6-1 3-2.2 4.2\"/>", "pet": "<path class=\"f\" d=\"M12 11.5c-3 0-6 3.5-6 6a2.5 2.5 0 0 0 3 2.3c1-.3 2-.6 3-.6s2 .3 3 .6a2.5 2.5 0 0 0 3-2.3c0-2.5-3-6-6-6z\"/><path class=\"s\" d=\"M12 11.5c-3 0-6 3.5-6 6a2.5 2.5 0 0 0 3 2.3c1-.3 2-.6 3-.6s2 .3 3 .6a2.5 2.5 0 0 0 3-2.3c0-2.5-3-6-6-6z\"/><ellipse class=\"w\" cx=\"4.8\" cy=\"10\" rx=\"1.8\" ry=\"2.3\"/><ellipse class=\"w\" cx=\"9\" cy=\"5.6\" rx=\"1.8\" ry=\"2.3\"/><ellipse class=\"w\" cx=\"15\" cy=\"5.6\" rx=\"1.8\" ry=\"2.3\"/><ellipse class=\"w\" cx=\"19.2\" cy=\"10\" rx=\"1.8\" ry=\"2.3\"/>", "salary": "<rect class=\"f\" x=\"2.5\" y=\"6\" width=\"19\" height=\"12\" rx=\"2\"/><rect class=\"s\" x=\"2.5\" y=\"6\" width=\"19\" height=\"12\" rx=\"2\"/><circle class=\"s\" cx=\"12\" cy=\"12\" r=\"2.8\"/><path class=\"s\" d=\"M6 9.5v5M18 9.5v5\"/>", "parttime": "<rect class=\"f\" x=\"3\" y=\"7\" width=\"18\" height=\"13\" rx=\"2.5\"/><rect class=\"s\" x=\"3\" y=\"7\" width=\"18\" height=\"13\" rx=\"2.5\"/><path class=\"s\" d=\"M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M3 12.5h18M11 12.5h2v2h-2z\"/>", "scholar": "<circle class=\"f\" cx=\"12\" cy=\"9\" r=\"6\"/><circle class=\"s\" cx=\"12\" cy=\"9\" r=\"6\"/><path class=\"s\" d=\"M8.5 13.8L7 21l5-2.5 5 2.5-1.5-7.2\"/><path class=\"w\" d=\"M12 5.8l1 2 2.2.3-1.6 1.5.4 2.2-2-1-2 1 .4-2.2-1.6-1.5 2.2-.3z\"/>", "family": "<path class=\"f\" d=\"M2.5 20a5.5 5.5 0 0 1 11 0z\"/><circle class=\"f\" cx=\"8\" cy=\"7.5\" r=\"3\"/><circle class=\"s\" cx=\"8\" cy=\"7.5\" r=\"3\"/><circle class=\"s\" cx=\"17\" cy=\"9.5\" r=\"2.3\"/><path class=\"s\" d=\"M2.5 20a5.5 5.5 0 0 1 11 0M14 20a3.8 3.8 0 0 1 7.5 0\"/>", "bonus": "<path class=\"f\" d=\"M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4l-5.3 3 1.2-6-4.5-4.1 6-.7z\"/><path class=\"s\" d=\"M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4l-5.3 3 1.2-6-4.5-4.1 6-.7z\"/>", "sub_ai": "<path class=\"f\" d=\"M11 3c.8 4.2 2.8 6.2 7 7-4.2.8-6.2 2.8-7 7-.8-4.2-2.8-6.2-7-7 4.2-.8 6.2-2.8 7-7z\"/><path class=\"s\" d=\"M11 3c.8 4.2 2.8 6.2 7 7-4.2.8-6.2 2.8-7 7-.8-4.2-2.8-6.2-7-7 4.2-.8 6.2-2.8 7-7z\"/><circle cx=\"18.5\" cy=\"18.5\" r=\"5\" fill=\"#fff\"/><path class=\"b\" d=\"M21 17.6a2.7 2.7 0 0 0-5-.7M16 19.4a2.7 2.7 0 0 0 5 .7M15.9 15.5v1.7h1.7M21.1 21.5v-1.7h-1.7\"/>", "sub_music": "<circle class=\"f\" cx=\"6\" cy=\"15\" r=\"2.6\"/><circle class=\"f\" cx=\"14.5\" cy=\"13\" r=\"2.6\"/><path class=\"s\" d=\"M8.6 15V5l8.5-2v10\"/><circle class=\"s\" cx=\"6\" cy=\"15\" r=\"2.6\"/><circle class=\"s\" cx=\"14.5\" cy=\"13\" r=\"2.6\"/><circle cx=\"18.5\" cy=\"18.5\" r=\"5\" fill=\"#fff\"/><path class=\"b\" d=\"M21 17.6a2.7 2.7 0 0 0-5-.7M16 19.4a2.7 2.7 0 0 0 5 .7M15.9 15.5v1.7h1.7M21.1 21.5v-1.7h-1.7\"/>", "sub_video": "<rect class=\"f\" x=\"2.5\" y=\"4.5\" width=\"16\" height=\"12\" rx=\"3\"/><rect class=\"s\" x=\"2.5\" y=\"4.5\" width=\"16\" height=\"12\" rx=\"3\"/><path class=\"s\" d=\"M8.8 8l4.5 2.5-4.5 2.5z\"/><circle cx=\"18.5\" cy=\"18.5\" r=\"5\" fill=\"#fff\"/><path class=\"b\" d=\"M21 17.6a2.7 2.7 0 0 0-5-.7M16 19.4a2.7 2.7 0 0 0 5 .7M15.9 15.5v1.7h1.7M21.1 21.5v-1.7h-1.7\"/>", "sub_cloud": "<path class=\"f\" d=\"M6.5 16a4 4 0 0 1-.5-8A5.5 5.5 0 0 1 16.5 7a4.5 4.5 0 0 1 .5 9z\"/><path class=\"s\" d=\"M6.5 16a4 4 0 0 1-.5-8A5.5 5.5 0 0 1 16.5 7a4.5 4.5 0 0 1 .5 9z\"/><circle cx=\"18.5\" cy=\"18.5\" r=\"5\" fill=\"#fff\"/><path class=\"b\" d=\"M21 17.6a2.7 2.7 0 0 0-5-.7M16 19.4a2.7 2.7 0 0 0 5 .7M15.9 15.5v1.7h1.7M21.1 21.5v-1.7h-1.7\"/>", "sub_game": "<g transform=\"translate(-1.5 -2) scale(.9)\"><path class=\"f\" d=\"M7 7h10a5 5 0 0 1 4.6 7l-1 2.3a2.5 2.5 0 0 1-4.3.5L14.5 15h-5l-1.8 1.8a2.5 2.5 0 0 1-4.3-.5l-1-2.3A5 5 0 0 1 7 7z\"/><path class=\"s\" d=\"M7 7h10a5 5 0 0 1 4.6 7l-1 2.3a2.5 2.5 0 0 1-4.3.5L14.5 15h-5l-1.8 1.8a2.5 2.5 0 0 1-4.3-.5l-1-2.3A5 5 0 0 1 7 7zM7.5 10v3M6 11.5h3M15.5 10.5h.01M17.5 12.5h.01\"/></g><circle cx=\"18.5\" cy=\"18.5\" r=\"5\" fill=\"#fff\"/><path class=\"b\" d=\"M21 17.6a2.7 2.7 0 0 0-5-.7M16 19.4a2.7 2.7 0 0 0 5 .7M15.9 15.5v1.7h1.7M21.1 21.5v-1.7h-1.7\"/>", "sub_app": "<rect class=\"f\" x=\"3\" y=\"3\" width=\"7\" height=\"7\" rx=\"2\"/><rect class=\"f\" x=\"12.5\" y=\"3\" width=\"7\" height=\"7\" rx=\"2\"/><rect class=\"f\" x=\"3\" y=\"12.5\" width=\"7\" height=\"7\" rx=\"2\"/><rect class=\"s\" x=\"3\" y=\"3\" width=\"7\" height=\"7\" rx=\"2\"/><rect class=\"s\" x=\"12.5\" y=\"3\" width=\"7\" height=\"7\" rx=\"2\"/><rect class=\"s\" x=\"3\" y=\"12.5\" width=\"7\" height=\"7\" rx=\"2\"/><circle cx=\"18.5\" cy=\"18.5\" r=\"5\" fill=\"#fff\"/><path class=\"b\" d=\"M21 17.6a2.7 2.7 0 0 0-5-.7M16 19.4a2.7 2.7 0 0 0 5 .7M15.9 15.5v1.7h1.7M21.1 21.5v-1.7h-1.7\"/>", "other": "<circle class=\"w\" cx=\"6\" cy=\"12\" r=\"2\"/><circle class=\"w\" cx=\"12\" cy=\"12\" r=\"2\"/><circle class=\"w\" cx=\"18\" cy=\"12\" r=\"2\"/>"};
+const CATS={food:{vi:'Ăn uống',en:'Food',c:'#E8772E',i:'rice'},coffee:{vi:'Cà phê',en:'Coffee',c:'#E8772E',i:'coffee'},milktea:{vi:'Trà sữa',en:'Milk tea',c:'#E8772E',i:'milktea'},transport:{vi:'Đi lại',en:'Transport',c:'#2F7FD6',i:'bike'},study:{vi:'Học tập',en:'Study',c:'#6D5BD0',i:'book'},fun:{vi:'Giải trí',en:'Fun',c:'#D6336C',i:'movie'},sport:{vi:'Thể thao',en:'Sports',c:'#0F9D8F',i:'badminton'},other:{vi:'Khác',en:'Other',c:'#6B7378',i:'other'},income:{vi:'Thu nhập',en:'Income',c:'#2B8A3E',i:'salary'}};
+const THEMES=[{id:'leaf',vi:'Lá',en:'Leaf',p:'#12805c',a:'#f2b705'},{id:'sea',vi:'Biển',en:'Sea',p:'#1565c0',a:'#ffb300'},{id:'clay',vi:'Cam đất',en:'Clay',p:'#c2410c',a:'#2563eb'},{id:'matcha',vi:'Matcha',en:'Matcha',p:'#5c7f3a',a:'#e8a33d',pro:1},{id:'sakura',vi:'Sakura',en:'Sakura',p:'#c2255c',a:'#0ca678',pro:1},{id:'coal',vi:'Than',en:'Coal',p:'#343a40',a:'#fab005',pro:1}];
+const S={lang:'vi',mode:'light',theme:'leaf',tab:'home',seg:'b',per:'w',balance:3300000,setAside:230000,spentToday:35000,streak:9,savedToday:false,
+cats:{food:[1520000,1800000],coffee:[245000,300000],transport:[180000,400000],study:[120000,500000],fun:[310000,300000]},
+tx:[{n:'Cà phê sữa',c:'coffee',a:35000,d:'21/11',k:'out'},{n:'Cơm tấm',c:'food',a:40000,d:'20/11',k:'out'},{n:'Grab về nhà',c:'transport',a:32000,d:'20/11',k:'out'},{n:'Chị Hai chuyển',c:'income',a:500000,d:'19/11',k:'in'},{n:'Vé xem phim',c:'fun',a:90000,d:'18/11',k:'out'}],
+bills:[{id:1,vi:'Cước điện thoại',en:'Phone plan',a:120000,due:4,d:'25/11',paid:false,c:'other',i:'topup'},{id:2,vi:'Điện nước phòng trọ',en:'Room utilities',a:450000,due:7,d:'28/11',paid:false,c:'other',i:'power'},{id:3,vi:'Tiền phòng',en:'Rent',a:2500000,due:14,d:'05/12',paid:false,c:'other',i:'rent'}],
+debts:[{id:1,kind:'inst',vi:'Trả góp laptop',en:'Laptop installment',a:500000,k:2,of:6,due:9,d:'30/11',paid:false},{id:2,kind:'owed',who:'Minh',a:150000,done:false}],
+goals:[{vi:'Laptop mới',en:'New laptop',have:3200000,target:12000000},{vi:'Về quê Tết',en:'Home for Tet',have:850000,target:2000000}],
+chat:[]};
+const NOV=[95000,140000,60000,210000,80000,75000,120000,110000,90000,150000,60000,35000,85000,40000,33000,185000,92000,240000,130000,310000];
+const PREV=[3420000,3050000,3800000,4100000,3300000];
+const LASTWK=1045000;
+const SUBS=[{i:'sub_ai',n:'Claude Pro',d:'03/12',a:500000},{i:'sub_music',n:'Spotify',d:'08/12',a:60000},{i:'sub_cloud',n:'iCloud+',d:'01/12',a:20000}];
+const $=id=>document.getElementById(id);
+const t=(k,v={})=>{let s=L[S.lang][k];if(typeof s!=='string')return s;for(const x in v)s=s.replace('{'+x+'}',v[x]);return s};
+const fk=n=>n>=1e6?(n/1e6).toFixed(1).replace('.',S.lang==='vi'?',':'.').replace(/[.,]0$/,'')+(S.lang==='vi'?'tr':'M'):Math.round(n/1000)+'k';
+const fm=n=>S.lang==='vi'?Math.round(n).toLocaleString('vi-VN')+'đ':Math.round(n).toLocaleString('en-US')+'₫';
+const cn=c=>CATS[c][S.lang];
+const DAYS=10;
+function calc(){const reserved=S.bills.filter(b=>!b.paid&&b.due<DAYS).reduce((s,b)=>s+b.a,0)+S.debts.filter(d=>d.kind==='inst'&&!d.paid&&d.due<DAYS).reduce((s,d)=>s+d.a,0);const pool=S.balance-reserved-S.setAside+S.spentToday;const daily=Math.max(0,Math.floor(pool/DAYS/500)*500);return{reserved,daily,left:Math.max(0,daily-S.spentToday),short:Math.max(0,-pool)}}
+const ICON={home:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',budget:'<circle cx="12" cy="12" r="9"/><path d="M12 3v9l6.5 6"/>',bills:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/>',ai:'<path d="M4 5h16v11H9l-5 4z"/><path d="M9 10h.01M12 10h.01M15 10h.01"/>',settings:'<circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-2-1.2L14 3h-4l-.5 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6a7 7 0 0 0 0 2.4l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 2 1.2L10 21h4l.5-2.6a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2z"/>'};
+function tabs(){$('tabs').innerHTML=['home','budget','add','bills','ai'].map(k=>k==='add'?`<button class="plus" data-tab="add" aria-label="${t('add')}"><span><svg viewBox="0 0 24 24" style="stroke:#fff"><path d="M12 5v14M5 12h14"/></svg></span></button>`:`<button data-tab="${k}" class="${S.tab===k?'on':''}"><svg viewBox="0 0 24 24">${ICON[k]}</svg>${t(k==='bills'?'billsTab':k)}</button>`).join('')}
+function icn(i,c){return `<span class="ic" style="background:${c};--c:${c}"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true">${ICO[i]}</svg></span>`}
+function ic(c){return icn(CATS[c].i,CATS[c].c)}
+function ring(v){const r=54,C=2*Math.PI*r,f=Math.max(0,Math.min(1,v));return `<svg class="ring" viewBox="0 0 132 132"><circle cx="66" cy="66" r="${r}" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="14"/><circle cx="66" cy="66" r="${r}" fill="none" stroke="var(--acc)" stroke-width="14" stroke-linecap="round" stroke-dasharray="${C*f} ${C}" transform="rotate(-90 66 66)"/><text x="66" y="62" text-anchor="middle" fill="#fff" font-size="26" font-weight="800">${Math.round(f*100)}%</text><text x="66" y="84" text-anchor="middle" fill="#fff" font-size="13" opacity=".85">${S.lang==='vi'?'còn lại':'left'}</text></svg>`}
+function home(){const k=calc();const due=S.bills.filter(b=>!b.paid).slice(0,2).map(b=>({n:b[S.lang],a:b.a,due:b.due})).concat(S.debts.filter(d=>d.kind==='inst'&&!d.paid).map(d=>({n:d[S.lang],a:d.a,due:d.due}))).sort((x,y)=>x.due-y.due);const cp=Math.round(S.cats.coffee[0]/S.cats.coffee[1]*100);
+return `<div class="hd"><div><div class="sm">${t('today')}</div><h2>${t('hi')}</h2></div><button class="av" data-tab="settings" aria-label="${t('settings')}"><span class="ic" style="background:var(--p)">T</span></button></div>
+<div class="card hero">${ring(k.daily?k.left/k.daily:0)}<div><div class="lbl">${t('leftToday')}</div><div class="big">${fm(k.left)}</div><div class="note">${k.short?t('short',{s:fm(k.short)}):t('perDay',{d:fm(k.daily),n:DAYS})}</div></div></div>
+<div class="minis"><div class="mini"><b>${fm(S.balance)}</b><span>${t('balance')}</span></div><div class="mini"><b>${fm(k.reserved)}</b><span>${t('reserved')}</span></div><div class="mini"><b>${fm(S.setAside)}</b><span>${t('fund')}</span></div></div>
+<button class="quick" data-go="add">${t('quick')}<i>+</i></button>${chart()}
+<div class="card"><h3 style="margin-top:0">${t('due')}</h3>${due.map(b=>`<div class="row"><div class="grow"><b>${b.n}</b><span>${t('inDays',{n:b.due})}</span></div><span class="amt">${fm(b.a)}</span></div>`).join('')}</div>
+<div class="card" style="background:var(--soft)"><b>${t('tip')}</b><div style="font-size:15px;margin-top:4px">${t('tipText',{p:cp})}</div></div>
+<div class="card"><h3 style="margin-top:0">${t('recent')}</h3>${S.tx.slice(0,5).map(x=>`<div class="row">${ic(x.c)}<div class="grow"><b>${x.n}</b><span>${cn(x.c)} · ${x.d}</span></div><span class="amt ${x.k}">${x.k==='in'?'+':'−'}${fm(x.a)}</span></div>`).join('')}</div>`}
+function budget(){const seg=`<div class="seg">${[['b','segB'],['g','segG']].map(([k,l])=>`<button data-seg="${k}" class="${S.seg===k?'on':''}">${t(l)}</button>`).join('')}</div>`;let body='';
+if(S.seg==='b'){const sp=Object.values(S.cats).reduce((s,v)=>s+v[0],0),lim=Object.values(S.cats).reduce((s,v)=>s+v[1],0);body=`<div class="card"><b>${t('month')}</b><div class="sm" style="color:var(--sub);font-size:14px">${t('spentOf',{a:fm(sp),b:fm(lim)})}</div><div class="bar" style="height:12px"><i style="width:${Math.min(100,sp/lim*100)}%"></i></div></div><div class="card">${Object.entries(S.cats).map(([c,[a,b]])=>{const p=a/b,cl=p>=1?'over':p>=.8?'warn':'';return `<div class="row">${ic(c)}<div class="grow"><b>${cn(c)} ${cl?`<span class="tag ${cl}">${t(cl==='over'?'over':'near')}</span>`:''}</b><span>${fm(a)} / ${fm(b)}</span><div class="bar"><i class="${cl}" style="width:${Math.min(100,p*100)}%"></i></div></div></div>`}).join('')}</div>`}
+if(S.seg==='g'){body=`<div class="card"><b style="font-size:17px">${t('ef')}</b><div style="color:var(--sub);font-size:14px">${t('efSub',{n:S.streak})}</div><div class="streak">${Array.from({length:14},(_,i)=>`<i class="${i<S.streak?'on':''} ${i===S.streak-(S.savedToday?1:0)?'today':''}"></i>`).join('')}</div><div style="font-size:24px;font-weight:800">${fm(S.setAside)}</div><button class="btn" data-act="save" ${S.savedToday?'disabled style="opacity:.6"':''}>${S.savedToday?t('saved'):t('saveToday')}</button></div><h3>${t('goals')}</h3><div class="card">${S.goals.map(g=>`<div class="row"><div class="grow"><b>${g[S.lang]}</b><span>${fm(g.have)} / ${fm(g.target)}</span><div class="bar"><i style="width:${g.have/g.target*100}%"></i></div></div><span class="amt">${Math.round(g.have/g.target*100)}%</span></div>`).join('')}</div>`}
+return `<div class="hd"><h2>${t('budget')}</h2></div>${seg}${body}`}
+function bills(){const k=calc();return `<div class="hd"><h2>${t('billsH')}</h2></div><div class="card hero" style="grid-template-columns:minmax(0,1fr)"><div><div class="lbl">${t('mustPay')}</div><div class="big">${fm(k.reserved)}</div></div></div><h3>${t('bills')}</h3><div class="card">${S.bills.map(b=>`<div class="row">${icn(b.i,'#5C6B7A')}<div class="grow"><b>${b[S.lang]}</b><span>${b.d} · ${t('inDays',{n:b.due})}</span></div><div style="text-align:right"><div class="amt">${fm(b.a)}</div>${b.paid?`<span class="tag" style="color:var(--p)">${t('paid')}</span>`:`<button class="btn sm" data-bill="${b.id}">${t('pay')}</button>`}</div></div>`).join('')}</div><h3>${t('subsH')} <span style="font-weight:500;color:var(--sub)">· ${t('subsTot',{a:fm(SUBS.reduce((x,y)=>x+y.a,0))})}</span></h3><div class="card">${SUBS.map(x=>`<div class="row">${icn(x.i,'#3B5BDB')}<div class="grow"><b>${x.n}</b><span>${t('renew',{d:x.d})}</span></div><span class="amt">${fm(x.a)}</span></div>`).join('')}</div><h3>${t('debts')}</h3><div class="card">${S.debts.map(d=>d.kind==='inst'?`<div class="row">${icn('gadget','#8B5E3C')}<div class="grow"><b>${d[S.lang]}</b><span>${t('inst',{a:d.k+(d.paid?1:0),b:d.of,c:fm(d.a*(d.of-d.k-(d.paid?1:0)))})}</span><div class="bar"><i style="width:${(d.k+(d.paid?1:0))/d.of*100}%"></i></div></div><div style="text-align:right"><div class="amt">${fm(d.a)}</div>${d.paid?`<span class="tag" style="color:var(--p)">${t('paid')}</span>`:`<button class="btn sm" data-debt="${d.id}">${t('pay')}</button>`}</div></div>`:`<div class="row">${icn('lend','#A61E4D')}<div class="grow"><b>${t('owedMe',{n:d.who})}</b><span>${S.lang==='vi'?'Tiền cơm hôm 15/11':'Dinner on Nov 15'}</span></div><div style="text-align:right"><div class="amt in">${fm(d.a)}</div>${d.done?`<span class="tag" style="color:var(--p)">${t('paid')}</span>`:`<button class="btn sm ghost" data-debt="${d.id}">${t('got')}</button>`}</div></div>`).join('')}</div>`}
+let LN=null;
+function chart(){const w=S.per==='w';const k=calc();
+const vals=w?[...NOV.slice(15,20),S.spentToday,null]:[...PREV,NOV.reduce((a,b)=>a+b,0)+S.spentToday];
+const labs=w?t('days'):t('mons');const hiI=w?5:5;
+const tot=vals.reduce((a,b)=>a+(b||0),0);const tv=w?tot:vals[5];
+const avg=PREV.reduce((a,b)=>a+b,0)/PREV.length;
+const cmp=w?t('vsWk',{a:fm(LASTWK)}):t('vsMo',{a:fm(avg)});
+const mx=Math.max(...vals.filter(v=>v!=null));
+LN={pts:w?[...NOV.slice(7),S.spentToday]:[...NOV,S.spentToday],start:w?8:1,daily:k.daily,w};
+return `<div class="card"><div class="chd"><div><b>${t('spend')}</b><div class="cmp">${w?t('wkTot'):t('moTot')}</div></div><div class="seg"><button data-per="w" class="${w?'on':''}">${t('wk')}</button><button data-per="m" class="${w?'':'on'}">${t('mo')}</button></div></div>
+<div class="tot" style="margin-top:8px">${fm(tv)}</div><div class="cmp">${cmp}</div>
+<div class="bars">${vals.map((v,i)=>`<div><span class="v">${v?fk(v):''}</span><div class="col">${v==null?'<i class="fut"></i>':`<i class="${i===hiI?'hi':''}" style="height:${Math.max(4,v/mx*100)}%"></i>`}</div><small>${labs[i]}</small></div>`).join('')}</div>
+<h3>${t('trend')}</h3><div class="line" id="ln" role="img" aria-label="${t('trend')}"></div>
+<div class="legend"><span><i></i>${t('spentDay')}</span><span><i class="d"></i>${t('safeLine',{a:fk(k.daily)})}</span></div></div>`}
+function drawLine(){const el=$('ln');if(!el||!LN)return;const W=el.clientWidth,H=el.clientHeight;if(!W)return;
+const P=LN.pts,n=P.length,l=6,r=46,tp=20,b=22;const mx=Math.max(...P,LN.daily)*1.12;
+const X=i=>l+i*(W-l-r)/(n-1),Y=v=>tp+(1-v/mx)*(H-tp-b);
+const pl=P.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');
+const step=LN.w?2:5;const ticks=P.map((v,i)=>i).filter(i=>i%step===0||i===n-1).filter((i,j,a)=>!(i!==n-1&&n-1-i<step/2+0.5&&a.includes(n-1)));
+const yd=Y(LN.daily);const last=P[n-1];
+el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="font-size:13px"><path d="M${X(0)},${H-b} L${pl.split(' ').join(' L')} L${X(n-1)},${H-b}Z" fill="var(--p)" opacity=".1"/>
+<line x1="${l}" x2="${W-r+4}" y1="${H-b}" y2="${H-b}" stroke="var(--line)"/>
+<line x1="${l}" x2="${W-r+4}" y1="${yd}" y2="${yd}" stroke="var(--acc)" stroke-width="2" stroke-dasharray="5 4"/>
+<text x="${W-r+6}" y="${yd+4}" fill="var(--sub)" style="paint-order:stroke;stroke:var(--surf);stroke-width:4px">${fk(LN.daily)}</text>
+<polyline points="${pl}" fill="none" stroke="var(--p)" stroke-width="2.5" stroke-linejoin="miter"/>
+${P.map((v,i)=>`<circle cx="${X(i)}" cy="${Y(v)}" r="${i===n-1?5:2.8}" fill="${i===n-1?'var(--acc)':'var(--p)'}" stroke="var(--surf)" stroke-width="${i===n-1?2:1}"/>`).join('')}
+<text x="${X(n-1)}" y="${Y(last)-10}" text-anchor="end" font-weight="700" fill="var(--ink)" style="paint-order:stroke;stroke:var(--surf);stroke-width:4px">${fk(last)}</text>
+${ticks.map(i=>`<text x="${X(i)}" y="${H-5}" text-anchor="middle" fill="var(--sub)">${LN.start+i}</text>`).join('')}</svg>`}
+const lro=new ResizeObserver(()=>drawLine());
+function ai(){if(!S.chat.length)S.chat.push({r:'a',x:t('aiHello')});return `<div class="hd"><h2>${t('ai')}</h2><span class="mode"><i></i>${t('aiMode')}</span></div><div class="chat">${S.chat.map((m,i)=>`<div class="msg ${m.r}">${m.x}${m.act?`<div class="act"><div class="t">${S.lang==='vi'?'Đề xuất thay đổi':'Proposed change'}</div><b>${m.act.label}</b>${m.act.st?`<div class="t" style="margin-top:6px">${t(m.act.st)}</div>`:`<div class="two"><button class="btn sm" data-ok="${i}">${t('confirm')}</button><button class="btn sm ghost" data-no="${i}">${t('reject')}</button></div>`}</div>`:''}</div>`).join('')}</div><div class="chips">${t('sugg').map(s=>`<button class="chip" data-ask="${s}">${s}</button>`).join('')}</div>`}
+function settings(){const seg=(key,opts)=>`<div class="seg" style="margin:6px 0 0">${opts.map(([v,l])=>`<button data-${key}="${v}" class="${S[key]===v?'on':''}">${l}</button>`).join('')}</div>`;
+return `<div class="hd"><h2>${t('settings')}</h2><button class="back" data-tab="home" aria-label="${t('home')}">‹</button></div><div class="card"><b>${t('lang')}</b>${seg('lang',[['vi','Tiếng Việt'],['en','English']])}</div><div class="card"><b>${t('look')}</b>${seg('mode',[['light',t('light')],['dark',t('dark')],['sys',t('sys')]])}</div>
+<div class="card"><b>${t('theme')}</b><div class="themes" style="margin-top:10px">${THEMES.map(x=>`<button class="th ${S.theme===x.id?'on':''}" data-theme-id="${x.id}"><div class="sw" style="background:${x.p}"><i></i><i style="background:${x.a}"></i></div>${x.pro?'<em>Pro</em>':''}<span>${x[S.lang]}</span></button>`).join('')}</div></div>
+<button class="card set" data-act="pro" style="border:2px solid var(--acc);display:block"><b>${t('pro')}</b><div class="v">${t('proSub')}</div></button>
+<div class="card" style="padding-block:4px"><div class="set"><span>${t('sync')}</span><span class="v">${t('synced')}</span></div><button class="set" data-act="export"><span>${t('export')}</span><span class="v">›</span></button><button class="set" data-act="del" style="color:#d6453d"><span>${t('del')}</span><span class="v">›</span></button></div>
+<div style="text-align:center;color:var(--sub);font-size:13px">MYX · v1.0.0 · tysonneee@gmail.com</div>`}
+function composer(){$('composer').innerHTML=S.tab==='ai'?`<form class="composer" id="cf"><input id="q" placeholder="${t('ask')}" autocomplete="off"><button class="btn sm" style="border-radius:99px;min-width:44px">↑</button></form>`:''}
+function applyTheme(){const th=THEMES.find(x=>x.id===S.theme);const a=$('app');a.style.setProperty('--p',th.p);a.style.setProperty('--acc',th.a);const dark=S.mode==='dark'||(S.mode==='sys'&&matchMedia('(prefers-color-scheme: dark)').matches);a.classList.toggle('dark',dark);document.documentElement.lang=S.lang}
+function render(){applyTheme();tabs();composer();$('scr').innerHTML=({home,budget,bills,ai,settings})[S.tab]();const ln=$('ln');if(ln){lro.disconnect();lro.observe(ln);drawLine()}if(S.tab==='ai')$('scr').scrollTop=1e5}
+function toast(m){const e=$('toast');e.textContent=m;e.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>e.classList.remove('show'),1800)}
+function sheet(h){$('panel').innerHTML='<div class="grab"></div>'+h;$('sheet').classList.add('open')}
+function close(){$('sheet').classList.remove('open')}
+const flat=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d');
+const KW=[['income',/\b(luong|salary|me cho|bo cho|duoc cho|chuyen cho|thuong|bonus|hoc bong|scholarship|income)\b/],['milktea',/\b(tra sua|milk tea|boba)\b/],['sport',/\b(cau long|bong da|bong chuyen|san bong|badminton|football|volleyball|gym)\b/],['coffee',/\b(ca phe|cafe|coffee|tra)\b/],['transport',/\b(xang|grab|bus|xe|gui xe|taxi|fuel|parking|ve xe)\b/],['study',/\b(sach|book|hoc|photo|tai lieu|course|but)\b/],['fun',/\b(phim|movie|game|nhau|karaoke|di choi|concert)\b/],['food',/\b(an|com|bun|pho|banh mi|banh|trua|toi|sang|lunch|dinner|breakfast|bread|food|mi|lau|bread)\b/]];
+function parse(txt){return txt.split(/[,;\n]|\s+(?:và|and|rồi)\s+/i).map(p=>p.trim()).filter(Boolean).map(p=>{const f=flat(p);let a=0,m;
+if(m=f.match(/(\d+)\s*(tr|trieu|cu|m)\s*(\d+)?/)){a=+m[1]*1e6+(m[3]?+m[3]/10**m[3].length*1e6:0)}
+else if(m=f.match(/(\d+(?:[.,]\d{3})*)\s*(k|nghin|ngan|d|vnd)?\b/)){const n=+m[1].replace(/[.,]/g,'');a=m[2]&&m[2]!=='d'&&m[2]!=='vnd'?n*1000:(n<1000?n*1000:n)}
+if(!a)return null;let c='other';for(const[k,r]of KW)if(r.test(f)){c=k;break}
+let n=p.replace(/\d+([.,]\d+)*\s*(k|nghìn|ngàn|tr|triệu|củ|m|đ|vnd)?\s*\d*/i,'').trim()||cn(c);return{n:n[0].toUpperCase()+n.slice(1),a:Math.round(a),c,k:c==='income'?'in':'out'}}).filter(Boolean)}
+let draft=[];
+function addSheet(pre=''){sheet(`<h2>${t('addT')}</h2><div style="color:var(--sub);font-size:14px;margin-bottom:10px">${t('addSub')}</div><textarea id="tx" placeholder="${t('samples')[0]}">${pre}</textarea><div class="chips">${t('samples').map(s=>`<button class="chip" data-sample="${s}">${s}</button>`).join('')}</div><button class="btn ghost" data-act="parse">${t('parse')}</button><div id="rev"></div>`)}
+function showRev(){$('rev').innerHTML=draft.length?draft.map((d,i)=>`<div class="rev">${ic(d.c)}<div class="grow"><b>${d.n}</b><select data-cat="${i}" aria-label="category">${Object.keys(CATS).map(c=>`<option value="${c}" ${c===d.c?'selected':''}>${cn(c)}</option>`).join('')}</select></div><span class="amt ${d.k}">${d.k==='in'?'+':'−'}${fm(d.a)}</span></div>`).join('')+`<button class="btn" style="margin-top:12px" data-act="saveAll">${t('saveAll',{n:draft.length})}</button>`:`<p style="color:#d6453d">${t('none')}</p>`}
+function reply(q){const f=flat(q),vi=S.lang==='vi';S.chat.push({r:'u',x:q});let m;
+if(/ca phe|coffee/.test(f)){const[a,b]=S.cats.coffee;S.chat.push({r:'a',x:vi?`Tháng này bạn chi ${fm(a)} cho cà phê, là ${Math.round(a/b*100)}% hạn mức ${fm(b)}. Trung bình khoảng ${fm(a/21)} mỗi ngày.`:`You spent ${fm(a)} on coffee this month, ${Math.round(a/b*100)}% of your ${fm(b)} limit. About ${fm(a/21)} a day.`})}
+else if((m=f.match(/(\d+(?:[.,]\d+)?)\s*(trieu|tr|million|m|k)/))&&/ngan sach|budget|han muc|limit/.test(f)){const n=parseFloat(m[1].replace(',','.'))*(/k/.test(m[2])?1e3:1e6);S.chat.push({r:'a',x:vi?'Mình có thể đặt hạn mức này cho bạn:':'I can set this limit for you:',act:{type:'limit',cat:'food',v:n,label:`${cn('food')}: ${fm(S.cats.food[1])} → ${fm(n)} / ${vi?'tháng':'month'}`}})}
+else if(/tiet kiem|save/.test(f)){S.chat.push({r:'a',x:vi?`Ba chỗ dễ cắt nhất tháng này: Giải trí đã vượt ${fm(S.cats.fun[0]-S.cats.fun[1])}; Ăn uống đã dùng ${Math.round(S.cats.food[0]/S.cats.food[1]*100)}% hạn mức; cà phê pha ở nhà 3 hôm/tuần tiết kiệm khoảng 75.000đ. Mình có thể tạo mục tiêu "Cắt ăn ngoài" nếu bạn muốn.`:`Easiest cuts this month: Fun is over by ${fm(S.cats.fun[0]-S.cats.fun[1])}; Food is at ${Math.round(S.cats.food[0]/S.cats.food[1]*100)}% of its limit; brewing coffee at home 3 days a week saves about 75,000₫. I can create a "Eat out less" goal if you like.`})}
+else if(/nhan tien|payday|ky/.test(f)){const k=calc();S.chat.push({r:'a',x:vi?`Còn ${DAYS} ngày đến kỳ nhận tiền 1/12. Sau khi giữ ${fm(k.reserved)} cho hóa đơn, mỗi ngày bạn tiêu được khoảng ${fm(k.daily)}; hôm nay còn ${fm(k.left)}.`:`${DAYS} days until payday on Dec 1. After holding ${fm(k.reserved)} for bills, you can spend about ${fm(k.daily)} a day; ${fm(k.left)} left today.`})}
+else{const p=parse(q);if(p.length){S.chat.push({r:'a',x:vi?'Mình hiểu là bạn muốn ghi:':'Looks like you want to log:',act:{type:'tx',items:p,label:p.map(x=>`${x.n} ${fm(x.a)}`).join(', ')}})}else S.chat.push({r:'a',x:vi?'Bản mẫu chỉ hiểu vài câu mẫu. Thử bấm một gợi ý bên dưới nhé.':'This prototype only knows a few questions. Try a suggestion below.'})}
+render()}
+function addTx(items){for(const d of items){S.tx.unshift({n:d.n,c:d.c,a:d.a,d:'21/11',k:d.k});if(d.k==='in')S.balance+=d.a;else{S.balance-=d.a;S.spentToday+=d.a;if(S.cats[d.c])S.cats[d.c][0]+=d.a}}}
+document.addEventListener('click',e=>{const b=e.target.closest('button,[data-go]');if(!b)return;const d=b.dataset;
+if(e.target===$('sheet')){close();return}
+if(d.tab){if(d.tab==='add'){addSheet();return}S.tab=d.tab;render();$('scr').scrollTop=S.tab==='ai'?1e5:0;return}
+if(d.go==='add'){addSheet();return}
+if(d.seg){S.seg=d.seg;render();return}
+if(d.per){S.per=d.per;render();return}
+if(d.lang){S.lang=d.lang;S.chat=[];render();return}
+if(d.mode){S.mode=d.mode;render();return}
+if(d.themeId){const th=THEMES.find(x=>x.id===d.themeId);S.theme=th.id;render();if(th.pro)toast(S.lang==='vi'?'Theme Pro · xem thử miễn phí':'Pro theme · free preview');return}
+if(d.bill){const x=S.bills.find(b=>b.id==d.bill);x.paid=true;S.balance-=x.a;S.tx.unshift({n:x[S.lang],c:'other',a:x.a,d:'21/11',k:'out'});render();return}
+if(d.debt){const x=S.debts.find(v=>v.id==d.debt);if(x.kind==='inst'){x.paid=true;S.balance-=x.a}else{x.done=true;S.balance+=x.a;S.tx.unshift({n:S.lang==='vi'?'Minh trả tiền':'Minh paid back',c:'income',a:x.a,d:'21/11',k:'in'})}render();return}
+if(d.sample){$('tx').value=d.sample;draft=parse(d.sample);showRev();return}
+if(d.cat!==undefined)return;
+if(d.ask){reply(d.ask);return}
+if(d.ok!==undefined){const m=S.chat[d.ok];if(m.act.type==='limit')S.cats[m.act.cat][1]=m.act.v;else addTx(m.act.items);m.act.st='done';render();return}
+if(d.no!==undefined){S.chat[d.no].act.st='dismissed';render();return}
+const a=d.act;
+if(a==='parse'){draft=parse($('tx').value);showRev()}
+else if(a==='saveAll'){addTx(draft);toast(t('toastSaved',{n:draft.length}));draft=[];close();S.tab='home';render()}
+else if(a==='save'){S.savedToday=true;S.setAside+=10000;S.streak+=1;render()}
+else if(a==='export')toast(t('toastExp'));
+else if(a==='del')sheet(`<h2>${t('delQ')}</h2><p style="color:var(--sub)">${t('delSub')}</p><div class="two" style="display:flex;gap:8px"><button class="btn ghost" data-act="close">${t('cancel')}</button><button class="btn danger" data-act="delYes">${t('delYes')}</button></div>`);
+else if(a==='delYes'){close();toast(t('toastDel'))}
+else if(a==='close')close();
+else if(a==='pro')sheet(`<h2>${t('pro')}</h2><p style="color:var(--sub);margin-top:0">${t('proNote')}</p>${(S.lang==='vi'?['Trợ lý AI cloud thông minh hơn, 300 câu hỏi/tháng','Thêm theme Matcha, Sakura, Than','Báo cáo nâng cao và xuất Excel','Đồng bộ nhiều thiết bị không giới hạn']:['Smarter cloud AI assistant, 300 questions a month','Extra themes: Matcha, Sakura, Coal','Advanced reports and Excel export','Unlimited device sync']).map(x=>`<div class="row"><span class="ic" style="background:var(--p)">✓</span><div class="grow">${x}</div></div>`).join('')}<button class="btn" style="margin-top:12px" data-act="close">${t('proBtn')}</button>`)});
+$('sheet').addEventListener('click',e=>{if(e.target.id==='sheet')close()});
+document.addEventListener('change',e=>{if(e.target.dataset.cat!==undefined){const i=+e.target.dataset.cat;draft[i].c=e.target.value;draft[i].k=e.target.value==='income'?'in':'out';showRev()}});
+document.addEventListener('submit',e=>{e.preventDefault();const q=$('q');if(q&&q.value.trim()){const v=q.value.trim();q.value='';reply(v)}});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(S.mode==='sys')render()});
+render();
+}
+</script>
+</body>
+</html>
