@@ -1,4 +1,4 @@
-# Budget AI: app quản lý ngân sách có AI
+# MYX: app quản lý tiền có AI cho sinh viên
 
 App quản lý chi tiêu cá nhân viết bằng **Expo (React Native) + TypeScript**. Bạn ghi chi tiêu bằng một câu tiếng Việt bình thường, AI tách thành từng giao dịch, xếp danh mục, theo dõi hạn mức và trả lời câu hỏi về thói quen chi tiêu.
 
@@ -25,8 +25,8 @@ Dữ liệu được lưu trên máy bằng AsyncStorage, không cần server.
 Cần: **Node.js 20+** trên máy tính và app **Expo Go** trên iPhone (cài từ App Store).
 
 ```bash
-git clone https://github.com/henrywizzrd/budget-manager.git
-cd budget-manager
+git clone https://github.com/henrywizzrd/myx.git
+cd myx
 npm install
 npx expo start
 ```
