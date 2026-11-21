@@ -81,7 +81,7 @@ export default function SettingsScreen() {
         {!!msg && <Txt size={13} color={C.accentInk}>{msg}</Txt>}
       </Card>
 
-      <Txt size={12} color={C.sub} style={{ textAlign: 'center' }}>Budget AI · v1.0.0</Txt>
+      <Txt size={12} color={C.sub} style={{ textAlign: 'center' }}>MYX · v1.0.0</Txt>
     </ScrollView>
   );
 }
