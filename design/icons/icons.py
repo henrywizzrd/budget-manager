@@ -1,6 +1,6 @@
 # MYX category icon set: 24x24 grid, duotone inside a coloured rounded tile.
 # Classes: f = soft white fill, s = white stroke, w = solid white, b = stroke in tile colour (badge).
-import json
+import json, os, re, sys
 
 GROUPS = [
  ("food", "Ăn uống", "Food & drink", "#E8772E"),
@@ -99,14 +99,45 @@ I = [
  ("other","misc","Khác","Other",'<circle class="w" cx="6" cy="12" r="2"/><circle class="w" cx="12" cy="12" r="2"/><circle class="w" cx="18" cy="12" r="2"/>'),
 ]
 
-def data():
+# Phosphor Icons (MIT, https://github.com/phosphor-icons/core) duotone glyphs used per icon id.
+# Ids not listed here keep the hand-drawn MYX glyph above.
+PH = {
+ "rice":"bowl-food","noodle":"bowl-steam","banhmi":"bread","coffee":"coffee","candy":"cookie",
+ "icecream":"ice-cream","fruit":"orange","market":"basket","beer":"beer-stein",
+ "fuel":"gas-pump","bike":"motorcycle","bus":"bus","car":"taxi","parking":"letter-circle-p",
+ "ticket":"ticket","repair":"wrench",
+ "rent":"house","power":"lightning","water":"drop","wifi":"globe","topup":"device-mobile","gas":"flame",
+ "tuition":"graduation-cap","book":"book-open","print":"printer","course":"monitor-play",
+ "music":"music-notes","movie":"film-slate","game":"game-controller","concert":"microphone-stage",
+ "travel":"suitcase-rolling","photo":"camera",
+ "volleyball":"volleyball","football":"soccer-ball","gym":"barbell","swim":"swimming-pool","run":"sneaker-move",
+ "clothes":"t-shirt","beauty":"scissors","gadget":"headphones","parcel":"package",
+ "medicine":"pill","doctor":"heartbeat",
+ "gift":"gift","charity":"hand-heart","lend":"hand-coins","date":"heart","pet":"paw-print",
+ "salary":"money","parttime":"briefcase","scholar":"medal","family":"users","bonus":"star",
+ "sub_ai":"sparkle","sub_music":"music-note","sub_video":"video","sub_cloud":"cloud",
+ "sub_game":"game-controller","sub_app":"squares-four","other":"dots-three",
+}
+
+def ph_glyph(name, root, scale=0.09375, offset=0):
+    svg = open(os.path.join(root, name + "-duotone.svg")).read()
+    out = []
+    for m in re.finditer(r'<path d="([^"]+)"( opacity="0.2")?/>', svg):
+        out.append('<path class="%s" d="%s"/>' % ("f" if m.group(2) else "w", m.group(1)))
+    assert out, name
+    return '<g transform="translate(%s %s) scale(%s)">%s</g>' % (offset, offset, scale, "".join(out))
+
+def data(root=None):
     return {
         "groups":[{"id":g,"vi":v,"en":e,"c":c} for g,v,e,c in GROUPS],
-        "icons":[{"id":i,"g":g,"vi":v,"en":e,"svg":s} for i,g,v,e,s in I],
+        "icons":[{"id":i,"g":g,"vi":v,"en":e,"src":"phosphor" if root and i in PH else "myx",
+                  "svg":(ph_glyph(PH[i],root,0.08,0)+BADGE if i.startswith("sub_") else ph_glyph(PH[i],root)) if root and i in PH else s}
+                 for i,g,v,e,s in I],
     }
 
 if __name__ == "__main__":
-    d=data(); ids=[x["id"] for x in d["icons"]]
+    root = sys.argv[1] if len(sys.argv) > 1 else None  # path to @phosphor-icons/core/assets/duotone
+    d=data(root); ids=[x["id"] for x in d["icons"]]
     assert len(ids)==len(set(ids))
-    print(len(ids),"icons")
+    print(len(ids),"icons,",sum(x["src"]=="phosphor" for x in d["icons"]),"from Phosphor")
     open(__import__("os").path.join(__import__("os").path.dirname(__file__),"icons.json"),"w").write(json.dumps(d,ensure_ascii=False))
