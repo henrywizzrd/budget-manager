@@ -22,6 +22,21 @@ owner's approval before the next starts.
 - **[Story]**: user story from spec.md (US1–US17)
 - Paths are relative to the repository root (single Expo project + `supabase/`).
 
+
+## Progress: test build 2026-11-21 (owner asked for one full build to test)
+
+Done in the test build: dock (US10: a, b, c, d, f), History tab, wallets and transfers, templates, safe-to-spend
+with onboarding and survival mode, jar split, bilingual parser with category learning, bills, debts,
+subscriptions with reminders, daily/weekly recap notifications, budgets, goals and emergency fund, charts,
+monthly recap card, assistant actions (affordability, subscription audit, limits, goals, logging), themes,
+hide amounts, app lock, CSV export, Pro screen (no purchase).
+
+Agreed deviations for this build (owner decision, to revisit):
+- Storage stays on AsyncStorage (JSON, key `myx/data/v2`, migrates v1); SQLite comes with Supabase sync (M4).
+- No Supabase, accounts, cloud AI, RevenueCat, widgets or Sentry yet.
+- Strings are VI/EN pairs at the call site (`useL()`), not separate catalog files.
+- Unit tests run with `tsx` scripts (`npm test`) instead of Jest.
+
 ---
 
 ## Phase 1: Setup — M0 part 1 (CI, ids, tooling)
